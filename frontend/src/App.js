@@ -15,21 +15,85 @@ function App() {
   return (
     <CartProvider>
       <Router>
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/testimonials" element={<Testimonials />} />
-              <Route path="/gallery" element={<Gallery />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/admin" element={<Admin />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
+        <Routes>
+          {/* Admin routes - no header/footer */}
+          <Route path="/" element={<Admin />} />
+          <Route path="/admin/*" element={<Admin />} />
+
+          {/* Public routes - with header/footer */}
+          <Route
+            path="/public"
+            element={
+              <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-grow">
+                  <Home />
+                </main>
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/public/about"
+            element={
+              <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-grow">
+                  <About />
+                </main>
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/public/products"
+            element={
+              <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-grow">
+                  <Products />
+                </main>
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/public/testimonials"
+            element={
+              <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-grow">
+                  <Testimonials />
+                </main>
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/public/gallery"
+            element={
+              <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-grow">
+                  <Gallery />
+                </main>
+                <Footer />
+              </div>
+            }
+          />
+          <Route
+            path="/public/cart"
+            element={
+              <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-grow">
+                  <Cart />
+                </main>
+                <Footer />
+              </div>
+            }
+          />
+        </Routes>
       </Router>
     </CartProvider>
   );

@@ -8,14 +8,6 @@ const categorySchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
-    description: {
-      type: String,
-      default: "",
-    },
-    image: {
-      type: String, // Cloudinary URL
-      default: "",
-    },
     isActive: {
       type: Boolean,
       default: true,

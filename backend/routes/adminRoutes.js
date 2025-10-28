@@ -6,6 +6,15 @@ const Admin = require("../models/Admin");
 
 const router = express.Router();
 
+// Generate tokens
+const generateAccessToken = (payload) => {
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "15m" });
+};
+
+const generateRefreshToken = (payload) => {
+  return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
+};
+
 // Admin login route
 router.post(
   "/login",
@@ -36,15 +45,28 @@ router.post(
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // Create JWT token
-      const token = jwt.sign(
-        { admin: true, email: admin.email, id: admin._id },
-        process.env.JWT_SECRET,
-        { expiresIn: "24h" }
+      // Generate tokens
+      const payload = { admin: true, email: admin.email, id: admin._id };
+      const accessToken = generateAccessToken(payload);
+      const refreshToken = generateRefreshToken(payload);
+
+      // Store refresh token in database using atomic operation
+      await Admin.findOneAndUpdate(
+        { _id: admin._id },
+        { $set: { refreshToken: refreshToken } },
+        { new: true, runValidators: true }
       );
 
+      // Set refresh token as HttpOnly cookie
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+
       res.json({
-        token,
+        accessToken,
         message: "Login successful",
         admin: {
           email: admin.email,
@@ -57,6 +79,77 @@ router.post(
     }
   }
 );
+
+// Refresh token route
+router.post("/refresh-token", async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    return res.status(401).json({ message: "No refresh token provided" });
+  }
+
+  try {
+    // Verify refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    // Find admin and verify refresh token matches
+    const admin = await Admin.findById(decoded.id);
+    if (!admin || admin.refreshToken !== refreshToken) {
+      return res.status(401).json({ message: "Invalid refresh token" });
+    }
+
+    // Generate new tokens
+    const payload = { admin: true, email: admin.email, id: admin._id };
+    const newAccessToken = generateAccessToken(payload);
+    const newRefreshToken = generateRefreshToken(payload);
+
+    // Update refresh token in database using atomic operation
+    await Admin.findOneAndUpdate(
+      { _id: decoded.id, refreshToken: refreshToken },
+      { $set: { refreshToken: newRefreshToken } },
+      { new: true, runValidators: true }
+    );
+
+    // Set new refresh token as HttpOnly cookie
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    res.json({
+      accessToken: newAccessToken,
+      message: "Token refreshed successfully",
+    });
+  } catch (error) {
+    console.error("Refresh token error:", error);
+    res.status(401).json({ message: "Invalid refresh token" });
+  }
+});
+
+// Logout route
+router.post("/logout", async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  if (refreshToken) {
+    try {
+      // Find admin and clear refresh token using atomic operation
+      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+      await Admin.findOneAndUpdate(
+        { _id: decoded.id, refreshToken: refreshToken },
+        { $set: { refreshToken: null } },
+        { new: true, runValidators: true }
+      );
+    } catch (error) {
+      // Ignore errors during logout
+    }
+  }
+
+  // Clear refresh token cookie
+  res.clearCookie("refreshToken");
+  res.json({ message: "Logged out successfully" });
+});
 
 // Verify admin token route
 router.get("/verify", (req, res) => {

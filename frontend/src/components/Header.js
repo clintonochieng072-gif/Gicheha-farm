@@ -1,19 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FaBars, FaTimes, FaLeaf, FaShoppingCart } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [logo, setLogo] = useState(null);
   const location = useLocation();
   const { getTotalItems } = useCart();
 
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/logos/active");
+        if (response.ok) {
+          const logoData = await response.json();
+          setLogo(logoData);
+        }
+      } catch (error) {
+        console.error("Error fetching logo:", error);
+      }
+    };
+
+    fetchLogo();
+  }, []);
+
   const navigation = [
-    { name: "Home", href: "/" },
-    { name: "About", href: "/about" },
-    { name: "Products", href: "/products" },
-    { name: "Testimonials", href: "/testimonials" },
-    { name: "Gallery", href: "/gallery" },
+    { name: "Home", href: "/public" },
+    { name: "About", href: "/public/about" },
+    { name: "Products", href: "/public/products" },
+    { name: "Testimonials", href: "/public/testimonials" },
+    { name: "Gallery", href: "/public/gallery" },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -21,49 +38,60 @@ const Header = () => {
   return (
     <header className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <img
-              src="/api/logo" // Will be replaced with actual logo endpoint
-              alt="Gicheha Farm Logo"
-              className="h-10 w-auto"
-              onError={(e) => {
-                e.target.style.display = "none";
-                e.target.nextElementSibling.style.display = "flex";
-              }}
-            />
-            <div
-              className="flex items-center space-x-2"
-              style={{ display: "none" }}
-            >
-              <FaLeaf className="text-primary-600 text-2xl" />
-              <span className="text-xl font-bold text-secondary-800">
-                Gicheha Farm Rongai
-              </span>
-            </div>
-          </Link>
+        <div className="flex justify-between items-center h-28">
+          {/* Left side - empty for balance */}
+          <div className="flex-1"></div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`${
-                  isActive(item.href)
-                    ? "text-primary-600 border-b-2 border-primary-600"
-                    : "text-secondary-600 hover:text-primary-600"
-                } px-3 py-2 text-sm font-medium transition-colors duration-200`}
+          {/* Center - Logo */}
+          <div className="flex-1 flex justify-center">
+            <Link to="/public" className="flex items-center">
+              {logo ? (
+                <img
+                  src={logo.url}
+                  alt={logo.name}
+                  className="h-24 w-auto max-w-[500px] object-contain"
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                    e.target.nextElementSibling.style.display = "flex";
+                  }}
+                />
+              ) : null}
+              <div
+                className="flex items-center space-x-2"
+                style={{ display: logo ? "none" : "flex" }}
               >
-                {item.name}
-              </Link>
-            ))}
+                <FaLeaf className="text-primary-600 text-2xl" />
+                <span className="text-xl font-bold text-secondary-800">
+                  Gicheha Farm Rongai
+                </span>
+              </div>
+            </Link>
+          </div>
+
+          {/* Right side - Navigation and Cart */}
+          <div className="flex-1 flex justify-end items-center space-x-8">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex space-x-8">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`${
+                    isActive(item.href)
+                      ? "text-primary-600 border-b-2 border-primary-600"
+                      : "text-secondary-600 hover:text-primary-600"
+                  } px-3 py-2 text-sm font-medium transition-colors duration-200`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+
             {/* Cart Icon */}
             <Link
-              to="/cart"
+              to="/public/cart"
               className={`${
-                isActive("/cart")
+                isActive("/public/cart")
                   ? "text-primary-600 border-b-2 border-primary-600"
                   : "text-secondary-600 hover:text-primary-600"
               } px-3 py-2 text-sm font-medium transition-colors duration-200 relative`}
@@ -75,16 +103,16 @@ const Header = () => {
                 </span>
               )}
             </Link>
-          </nav>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-secondary-600 hover:text-primary-600 p-2"
-            >
-              {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-            </button>
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="text-secondary-600 hover:text-primary-600 p-2"
+              >
+                {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -108,9 +136,9 @@ const Header = () => {
               ))}
               {/* Mobile Cart Link */}
               <Link
-                to="/cart"
+                to="/public/cart"
                 className={`${
-                  isActive("/cart")
+                  isActive("/public/cart")
                     ? "text-primary-600 bg-primary-50"
                     : "text-secondary-600 hover:text-primary-600 hover:bg-primary-50"
                 } block px-3 py-2 text-base font-medium rounded-md transition-colors duration-200 flex items-center justify-between`}

@@ -19,16 +19,7 @@ const productSchema = new mongoose.Schema(
     category: {
       type: String,
       required: false,
-      enum: [
-        "",
-        "vegetables",
-        "fruits",
-        "dairy",
-        "meat",
-        "grains",
-        "other",
-        "poultry",
-      ],
+      default: "",
     },
     images: {
       type: [String], // Array of Cloudinary URLs

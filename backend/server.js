@@ -1,15 +1,34 @@
 require("dotenv").config(); // ensure env loaded before anything else
 
 const express = require("express");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const connectDB = require("./config/database");
 const productRoutes = require("./routes/productRoutes");
 const testimonialRoutes = require("./routes/testimonialRoutes");
 const galleryRoutes = require("./routes/galleryRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+const socialMediaRoutes = require("./routes/socialMediaRoutes");
+const logoRoutes = require("./routes/logoRoutes");
+const unitRoutes = require("./routes/unitRoutes");
+const featureRoutes = require("./routes/featureRoutes");
+const aboutRoutes = require("./routes/aboutRoutes");
 const path = require("path");
 
 const app = express();
 
+// CORS configuration
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions));
+
+// Middleware
+app.use(cookieParser());
 app.use(express.json());
 
 // register routes
@@ -17,6 +36,12 @@ app.use("/api/products", productRoutes);
 app.use("/api/testimonials", testimonialRoutes);
 app.use("/api/gallery", galleryRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/social-media", socialMediaRoutes);
+app.use("/api/logos", logoRoutes);
+app.use("/api/units", unitRoutes);
+app.use("/api/features", featureRoutes);
+app.use("/api/about", aboutRoutes);
 
 // Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

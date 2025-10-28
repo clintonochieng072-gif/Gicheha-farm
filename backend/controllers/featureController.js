@@ -45,7 +45,7 @@ exports.updateFeature = async (req, res, next) => {
     const feature = await Feature.findOneAndUpdate(
       { _id: featureId },
       { $set: updateData },
-      { new: true, runValidators: true }
+      { new: true, runValidators: false }
     );
 
     if (!feature) {

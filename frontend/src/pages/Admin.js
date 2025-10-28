@@ -8,7 +8,7 @@ const Admin = () => {
 
   useEffect(() => {
     // Check if admin is already logged in
-    const storedToken = localStorage.getItem("adminToken");
+    const storedToken = localStorage.getItem("accessToken");
     if (storedToken) {
       setToken(storedToken);
       setIsLoggedIn(true);
@@ -21,7 +21,7 @@ const Admin = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("adminToken");
+    localStorage.removeItem("accessToken");
     setToken("");
     setIsLoggedIn(false);
   };

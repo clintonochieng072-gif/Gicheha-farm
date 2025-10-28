@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../utils/api";
 
 const AdminLogin = ({ onLogin }) => {
   const [credentials, setCredentials] = useState({
@@ -22,13 +22,12 @@ const AdminLogin = ({ onLogin }) => {
     setError("");
 
     try {
-      // Note: This assumes you have an admin login endpoint
-      // You may need to implement this in the backend
-      const response = await axios.post("/api/admin/login", credentials);
-      const { token } = response.data;
+      const response = await api.post("/admin/login", credentials);
+      const { accessToken } = response.data;
 
-      localStorage.setItem("adminToken", token);
-      onLogin(token);
+      // Store access token in memory (not localStorage for security)
+      localStorage.setItem("accessToken", accessToken);
+      onLogin(accessToken);
     } catch (error) {
       setError(error.response?.data?.message || "Login failed");
     } finally {

@@ -23,7 +23,7 @@ const ProductCard = ({ product, onAddToCart }) => {
       <div className="relative overflow-hidden rounded-t-lg">
         <img
           src={images[currentImageIndex]}
-          alt={product.name}
+          alt={product.name || "Product"}
           className="w-full h-48 object-contain group-hover:scale-105 transition-transform duration-300 bg-gray-50"
         />
         {images.length > 1 && (
@@ -69,22 +69,26 @@ const ProductCard = ({ product, onAddToCart }) => {
 
       <div className="p-4">
         <h3 className="text-lg font-semibold text-secondary-800 mb-2">
-          {product.name}
+          {product.name || "Unnamed Product"}
         </h3>
         <p className="text-secondary-600 text-sm mb-3 line-clamp-2">
-          {product.description}
+          {product.description || "No description available"}
         </p>
 
         <div className="flex items-center justify-between mb-3">
           <span className="text-2xl font-bold text-primary-600">
-            KSh {product.price}
+            KSh {product.price || "0"}
           </span>
-          <span className="text-sm text-secondary-500">per {product.unit}</span>
+          <span className="text-sm text-secondary-500">
+            per {product.unit || "unit"}
+          </span>
         </div>
 
         <div className="flex items-center justify-between">
           <span className="text-sm text-secondary-600 capitalize">
-            {product.category || "Uncategorized"}
+            {product.category && product.category !== ""
+              ? product.category
+              : "Uncategorized"}
           </span>
           <button
             onClick={() => onAddToCart && onAddToCart(product)}

@@ -1,20 +1,27 @@
-# TODO List for Gicheha Farm MERN Stack Project
+# TODO: Add Admin Management for Why Choose Us and About Sections
 
-## Completed Tasks
+## Backend Tasks
 
-- [x] Homepage Hero Section: Add high-quality farm images and responsive design
+- [x] Create Feature model for Why Choose Us section
+- [x] Create About model for About section (History, Mission, Values)
+- [x] Create featureController.js with CRUD operations
+- [x] Create aboutController.js with CRUD operations
+- [x] Create featureRoutes.js for API endpoints
+- [x] Create aboutRoutes.js for API endpoints
+- [x] Update server.js to include new routes
+- [x] Update seed.js to add initial data if needed
 
-## Pending Tasks
+## Frontend Tasks
 
-- [x] About Us Section: Create comprehensive about section with history, mission, values
-  - [x] Add About Us section to Home.js after hero and before featured products
-  - [x] Include history, mission, values content
-  - [x] Ensure professional typography and clean layout
-- [ ] Map Integration: Implement Google Maps with Rongai location marker
-- [ ] Product Categories Management: Backend model, routes, and admin UI for category CRUD
-- [ ] Social Media Links: Backend storage and admin management for social links
-- [ ] Farm Logo Upload: Backend model, Cloudinary upload, admin interface
-- [ ] Design & UX Improvements: Agricultural theme, responsive design, image optimization
-- [ ] Frontend Enhancements: Verify all clickable elements, proper image display
-- [ ] Validation & Forms: Ensure all forms handle optional fields correctly
-- [ ] Environment & Deployment: Verify .env usage and port configurations
+- [x] Update AdminDashboard.js to add new tabs for "Why Choose Us" and "About"
+- [x] Add form handling for Feature management (title, description, icon)
+- [x] Add form handling for About management (section, title, content)
+- [x] Update Home.js to fetch features and about data from API instead of hardcoded content
+- [x] Update Home.js to display dynamic content for Why Choose Us and About sections
+
+## Testing
+
+- [ ] Test admin CRUD operations for features
+- [ ] Test admin CRUD operations for about content
+- [ ] Test public homepage displays updated content
+- [ ] Verify integration between admin and public views

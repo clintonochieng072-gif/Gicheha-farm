@@ -14,19 +14,7 @@ const featureSchema = new mongoose.Schema(
     icon: {
       type: String,
       required: true,
-      enum: [
-        "FaEgg",
-        "FaHorse",
-        "FaCarrot",
-        "FaTruck",
-        "FaShieldAlt",
-        "FaUsers",
-        "FaLeaf",
-        "FaSeedling",
-        "FaTractor",
-        "FaMapMarkerAlt",
-      ],
-      default: "FaLeaf",
+      default: "leaf",
     },
     isActive: {
       type: Boolean,

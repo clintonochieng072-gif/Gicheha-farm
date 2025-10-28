@@ -14,15 +14,7 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("name");
 
-  const categories = [
-    "all",
-    "vegetables",
-    "fruits",
-    "dairy",
-    "meat",
-    "grains",
-    "other",
-  ];
+  const categories = ["all", "eggs", "cows", "sheep", "goat", "vegetables"];
 
   useEffect(() => {
     fetchProducts();
@@ -46,8 +38,10 @@ const Products = () => {
   const filterAndSortProducts = () => {
     let filtered = products.filter((product) => {
       const matchesSearch =
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase());
+        (product.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product.description || "")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
       const matchesCategory =
         selectedCategory === "all" || product.category === selectedCategory;
       return matchesSearch && matchesCategory;
@@ -57,13 +51,13 @@ const Products = () => {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "name":
-          return a.name.localeCompare(b.name);
+          return (a.name || "").localeCompare(b.name || "");
         case "price-low":
-          return a.price - b.price;
+          return (a.price || 0) - (b.price || 0);
         case "price-high":
-          return b.price - a.price;
+          return (b.price || 0) - (a.price || 0);
         case "newest":
-          return new Date(b.createdAt) - new Date(a.createdAt);
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
         default:
           return 0;
       }
@@ -181,7 +175,8 @@ const Products = () => {
             >
               <div className="font-semibold capitalize">{category}</div>
               <div className="text-sm opacity-75">
-                {products.filter((p) => p.category === category).length} items
+                {products.filter((p) => (p.category || "") === category).length}{" "}
+                items
               </div>
             </button>
           ))}
