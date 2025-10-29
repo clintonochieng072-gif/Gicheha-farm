@@ -14,7 +14,12 @@ const Header = () => {
   useEffect(() => {
     const fetchLogo = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/logos/active");
+        const response = await fetch(
+          `${
+            process.env.REACT_APP_API_URL ||
+            "https://gicheha-farm.onrender.com/api"
+          }/logos/active`
+        );
         if (response.ok) {
           const logoData = await response.json();
           setLogo(logoData);
@@ -26,7 +31,12 @@ const Header = () => {
 
     const fetchSocialMedia = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/social-media");
+        const response = await fetch(
+          `${
+            process.env.REACT_APP_API_URL ||
+            "https://gicheha-farm.onrender.com/api"
+          }/social-media`
+        );
         if (response.ok) {
           const socialMediaData = await response.json();
           setSocialMedia(socialMediaData);
