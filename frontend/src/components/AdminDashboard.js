@@ -12,10 +12,19 @@ const AdminDashboard = ({ token, onLogout }) => {
   const [logos, setLogos] = useState([]);
   const [features, setFeatures] = useState([]);
   const [abouts, setAbouts] = useState([]);
+  const [team, setTeam] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [credentialsForm, setCredentialsForm] = useState({
+    currentPassword: "",
+    newEmail: "",
+    newPassword: "",
+  });
+  const [credentialsLoading, setCredentialsLoading] = useState(false);
+  const [credentialsMessage, setCredentialsMessage] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -67,6 +76,12 @@ const AdminDashboard = ({ token, onLogout }) => {
       } else if (activeTab === "about") {
         const response = await api.get("/about/admin");
         setAbouts(response.data);
+      } else if (activeTab === "team") {
+        const response = await api.get("/team");
+        setTeam(response.data);
+      } else if (activeTab === "videos") {
+        const response = await api.get("/gallery?type=video");
+        setVideos(response.data);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -107,6 +122,8 @@ const AdminDashboard = ({ token, onLogout }) => {
       else if (type === "logo") endpoint = `/logos/${id}`;
       else if (type === "feature") endpoint = `/features/${id}`;
       else if (type === "about") endpoint = `/about/${id}`;
+      else if (type === "video") endpoint = `/gallery/${id}`;
+      else if (type === "team") endpoint = `/team/${id}`;
 
       await api.delete(endpoint);
       fetchData();
@@ -163,6 +180,12 @@ const AdminDashboard = ({ token, onLogout }) => {
       icon: item.icon || "",
       section: item.section || "",
       content: item.content || "",
+      name: item.name || "",
+      position: item.position || "",
+      bio: item.bio || "",
+      initials: item.initials || "",
+      order: item.order || 0,
+      type: item.type || "image",
     });
     setShowAddForm(true);
   };
@@ -211,6 +234,8 @@ const AdminDashboard = ({ token, onLogout }) => {
             }
           );
         } else if (editingItem.type === "gallery") {
+          // Add type to formData for gallery updates
+          formDataToSend.append("type", formData.type || "image");
           response = await api.put(
             `/gallery/${editingItem._id}`,
             formDataToSend,
@@ -272,6 +297,34 @@ const AdminDashboard = ({ token, onLogout }) => {
             isActive: formData.isActive,
           };
           response = await api.put(`/about/${editingItem._id}`, aboutData);
+        } else if (editingItem.type === "video") {
+          // Video update with FormData
+          const videoData = new FormData();
+          videoData.append("title", formData.title);
+          videoData.append("description", formData.description);
+          videoData.append("category", formData.category);
+          videoData.append("type", "video");
+          if (formData.image) {
+            videoData.append("image", formData.image);
+          }
+          response = await api.put(`/gallery/${editingItem._id}`, videoData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        } else if (editingItem.type === "team") {
+          // Team member update with FormData for image
+          const teamData = new FormData();
+          teamData.append("name", formData.name);
+          teamData.append("position", formData.position);
+          teamData.append("bio", formData.bio);
+          teamData.append("initials", formData.initials);
+          teamData.append("order", formData.order);
+          teamData.append("isActive", formData.isActive);
+          if (formData.image) {
+            teamData.append("image", formData.image);
+          }
+          response = await api.put(`/team/${editingItem._id}`, teamData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
         }
       } else {
         // Create new item
@@ -284,6 +337,8 @@ const AdminDashboard = ({ token, onLogout }) => {
             headers: { "Content-Type": "multipart/form-data" },
           });
         } else if (activeTab === "gallery") {
+          // Add type to formData for gallery creation
+          formDataToSend.append("type", formData.type || "image");
           response = await api.post("/gallery", formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
           });
@@ -331,6 +386,34 @@ const AdminDashboard = ({ token, onLogout }) => {
             isActive: formData.isActive,
           };
           response = await api.post("/about", aboutData);
+        } else if (activeTab === "videos") {
+          // Video creation with FormData
+          const videoData = new FormData();
+          videoData.append("title", formData.title);
+          videoData.append("description", formData.description);
+          videoData.append("category", formData.category);
+          videoData.append("type", "video");
+          if (formData.image) {
+            videoData.append("image", formData.image);
+          }
+          response = await api.post("/gallery", videoData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        } else if (activeTab === "team") {
+          // Team member creation with FormData for image
+          const teamData = new FormData();
+          teamData.append("name", formData.name);
+          teamData.append("position", formData.position);
+          teamData.append("bio", formData.bio);
+          teamData.append("initials", formData.initials);
+          teamData.append("order", formData.order);
+          teamData.append("isActive", formData.isActive);
+          if (formData.image) {
+            teamData.append("image", formData.image);
+          }
+          response = await api.post("/team", teamData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
         }
       }
 
@@ -418,12 +501,15 @@ const AdminDashboard = ({ token, onLogout }) => {
     { id: "products", name: "Products" },
     { id: "testimonials", name: "Testimonials" },
     { id: "gallery", name: "Gallery" },
+    { id: "videos", name: "Videos" },
     { id: "categories", name: "Categories" },
     { id: "units", name: "Units" },
     { id: "social-media", name: "Social Media" },
     { id: "logos", name: "Logos" },
     { id: "why-choose-us", name: "Why Choose Us" },
     { id: "about", name: "About" },
+    { id: "team", name: "Team" },
+    { id: "credentials", name: "Credentials" },
   ];
 
   const handleLogout = async () => {
@@ -444,6 +530,28 @@ const AdminDashboard = ({ token, onLogout }) => {
     navigator.clipboard.writeText(publicUrl).then(() => {
       alert("Public URL copied to clipboard!");
     });
+  };
+
+  const handleCredentialsUpdate = async (e) => {
+    e.preventDefault();
+    setCredentialsLoading(true);
+    setCredentialsMessage("");
+
+    try {
+      const response = await api.put("/admin/credentials", credentialsForm);
+      setCredentialsMessage("Credentials updated successfully!");
+      setCredentialsForm({
+        currentPassword: "",
+        newEmail: "",
+        newPassword: "",
+      });
+    } catch (error) {
+      setCredentialsMessage(
+        error.response?.data?.message || "Failed to update credentials"
+      );
+    } finally {
+      setCredentialsLoading(false);
+    }
   };
 
   return (
@@ -628,10 +736,19 @@ const AdminDashboard = ({ token, onLogout }) => {
 
               {activeTab === "gallery" && (
                 <>
+                  <select
+                    name="type"
+                    value={formData.type || "image"}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="image">Image</option>
+                    <option value="video">Video</option>
+                  </select>
                   <input
                     type="text"
                     name="title"
-                    placeholder="Image Title"
+                    placeholder="Title"
                     value={formData.title}
                     onChange={handleInputChange}
                     className="w-full p-2 border rounded"
@@ -647,7 +764,50 @@ const AdminDashboard = ({ token, onLogout }) => {
                   <input
                     type="file"
                     name="image"
-                    accept="image/*"
+                    accept={
+                      (formData.type || "image") === "video"
+                        ? "video/*"
+                        : "image/*"
+                    }
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="general">General</option>
+                    <option value="farm">Farm</option>
+                    <option value="products">Products</option>
+                    <option value="events">Events</option>
+                  </select>
+                </>
+              )}
+
+              {activeTab === "videos" && (
+                <>
+                  <input
+                    type="text"
+                    name="title"
+                    placeholder="Video Title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                  <textarea
+                    name="description"
+                    placeholder="Video Description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                    rows="2"
+                  />
+                  <input
+                    type="file"
+                    name="image"
+                    accept="video/*"
                     onChange={handleInputChange}
                     className="w-full p-2 border rounded"
                   />
@@ -916,6 +1076,71 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </>
               )}
 
+              {activeTab === "team" && (
+                <>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Full Name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    name="position"
+                    placeholder="Position/Title"
+                    value={formData.position}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                  <textarea
+                    name="bio"
+                    placeholder="Bio/Description"
+                    value={formData.bio}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                    rows="3"
+                  />
+                  <input
+                    type="text"
+                    name="initials"
+                    placeholder="Initials (e.g., JG, MW, DK)"
+                    value={formData.initials}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    name="order"
+                    placeholder="Display Order"
+                    value={formData.order}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      name="isActive"
+                      checked={
+                        formData.isActive !== undefined
+                          ? formData.isActive
+                          : true
+                      }
+                      onChange={handleInputChange}
+                    />
+                    <label>Active</label>
+                  </div>
+                </>
+              )}
+
               <div className="flex space-x-2">
                 <button
                   type="submit"
@@ -1063,28 +1288,47 @@ const AdminDashboard = ({ token, onLogout }) => {
                   onClick={() => handleAddNew("gallery")}
                   className="btn-primary"
                 >
-                  Add New Image
+                  Add New Item
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {gallery.map((image) => (
-                  <div key={image._id} className="card">
-                    <img
-                      src={image.image}
-                      alt={image.title}
-                      className="w-full h-32 object-contain rounded-t-lg"
-                    />
+                {gallery.map((item) => (
+                  <div key={item._id} className="card">
+                    {item.type === "video" ? (
+                      <video
+                        src={item.video}
+                        className="w-full h-32 object-cover rounded-t-lg"
+                        controls
+                      />
+                    ) : (
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-full h-32 object-cover rounded-t-lg"
+                      />
+                    )}
                     <div className="p-4">
-                      <h3 className="font-semibold">{image.title}</h3>
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-semibold">{item.title}</h3>
+                        <span
+                          className={`px-2 py-1 text-xs rounded ${
+                            item.type === "video"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-green-100 text-green-800"
+                          }`}
+                        >
+                          {item.type}
+                        </span>
+                      </div>
                       <div className="flex space-x-2 mt-3">
                         <button
-                          onClick={() => handleEdit(image, "gallery")}
+                          onClick={() => handleEdit(item, "gallery")}
                           className="btn-secondary text-xs"
                         >
                           Edit
                         </button>
                         <button
-                          onClick={() => handleDelete("gallery", image._id)}
+                          onClick={() => handleDelete("gallery", item._id)}
                           className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
                         >
                           Delete
@@ -1422,6 +1666,196 @@ const AdminDashboard = ({ token, onLogout }) => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "videos" && (
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">Videos Management</h2>
+                <button
+                  onClick={() => handleAddNew("video")}
+                  className="btn-primary"
+                >
+                  Add New Video
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {videos.map((video) => (
+                  <div key={video._id} className="card">
+                    <video
+                      src={video.video}
+                      className="w-full h-32 object-cover rounded-t-lg"
+                      controls
+                    />
+                    <div className="p-4">
+                      <h3 className="font-semibold">{video.title}</h3>
+                      <p className="text-secondary-600 text-sm">
+                        {video.description}
+                      </p>
+                      <div className="flex space-x-2 mt-3">
+                        <button
+                          onClick={() => handleEdit(video, "video")}
+                          className="btn-secondary text-xs"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete("gallery", video._id)}
+                          className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "team" && (
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">Team Management</h2>
+                <button
+                  onClick={() => handleAddNew("team")}
+                  className="btn-primary"
+                >
+                  Add New Team Member
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {team.map((member) => (
+                  <div key={member._id} className="card">
+                    <div className="flex items-center space-x-4 p-4">
+                      <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-xl">
+                        {member.initials}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold">{member.name}</h3>
+                        <p className="text-secondary-600 text-sm">
+                          {member.position}
+                        </p>
+                        <div className="flex items-center justify-between mt-2">
+                          <span
+                            className={`px-2 py-1 text-xs rounded ${
+                              member.isActive
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {member.isActive ? "Active" : "Inactive"}
+                          </span>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleEdit(member, "team")}
+                              className="btn-secondary text-xs"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete("team", member._id)}
+                              className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "credentials" && (
+            <div>
+              <h2 className="text-2xl font-semibold mb-6">
+                Admin Credentials Management
+              </h2>
+              <div className="max-w-md">
+                <div className="card">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Change Password & Email
+                  </h3>
+                  <form onSubmit={handleCredentialsUpdate}>
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-secondary-700 mb-2">
+                        Current Password
+                      </label>
+                      <input
+                        type="password"
+                        value={credentialsForm.currentPassword}
+                        onChange={(e) =>
+                          setCredentialsForm((prev) => ({
+                            ...prev,
+                            currentPassword: e.target.value,
+                          }))
+                        }
+                        className="input-field"
+                        required
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-secondary-700 mb-2">
+                        New Email (Optional)
+                      </label>
+                      <input
+                        type="email"
+                        value={credentialsForm.newEmail}
+                        onChange={(e) =>
+                          setCredentialsForm((prev) => ({
+                            ...prev,
+                            newEmail: e.target.value,
+                          }))
+                        }
+                        className="input-field"
+                        placeholder="Leave empty to keep current email"
+                      />
+                    </div>
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-secondary-700 mb-2">
+                        New Password (Optional)
+                      </label>
+                      <input
+                        type="password"
+                        value={credentialsForm.newPassword}
+                        onChange={(e) =>
+                          setCredentialsForm((prev) => ({
+                            ...prev,
+                            newPassword: e.target.value,
+                          }))
+                        }
+                        className="input-field"
+                        placeholder="Leave empty to keep current password"
+                        minLength={6}
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full btn-primary"
+                      disabled={credentialsLoading}
+                    >
+                      {credentialsLoading
+                        ? "Updating..."
+                        : "Update Credentials"}
+                    </button>
+                  </form>
+                  {credentialsMessage && (
+                    <div
+                      className={`mt-4 px-4 py-3 rounded ${
+                        credentialsMessage.includes("success")
+                          ? "bg-green-100 border border-green-400 text-green-700"
+                          : "bg-red-100 border border-red-400 text-red-700"
+                      }`}
+                    >
+                      {credentialsMessage}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
