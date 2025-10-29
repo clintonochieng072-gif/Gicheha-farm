@@ -16,84 +16,110 @@ const getGallery = async (req, res) => {
   }
 };
 
-// @desc    Create new gallery image
+// @desc    Create new gallery item (image or video)
 // @route   POST /api/gallery
 // @access  Private (Admin)
 const createGalleryImage = async (req, res) => {
   try {
-    const { title, description, category } = req.body;
+    const { title, description, category, type } = req.body;
 
     if (!req.file) {
-      return res.status(400).json({ message: "Image file is required" });
+      return res.status(400).json({ message: "File is required" });
     }
 
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "gicheha-farm/gallery",
-    });
+    const itemType = type || "image";
 
-    const galleryImage = new Gallery({
-      title: title || "Untitled Image",
+    let result;
+    if (itemType === "video") {
+      result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "gicheha-farm/gallery/videos",
+        resource_type: "video",
+      });
+    } else {
+      result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "gicheha-farm/gallery/images",
+      });
+    }
+
+    const galleryItem = new Gallery({
+      title: title || `Untitled ${itemType}`,
       description: description || "",
-      image: result.secure_url,
+      type: itemType,
+      image: itemType === "image" ? result.secure_url : null,
+      video: itemType === "video" ? result.secure_url : null,
       category: category || "general",
       isActive: true,
     });
 
-    const createdImage = await galleryImage.save();
-    res.status(201).json(createdImage);
+    const createdItem = await galleryItem.save();
+    res.status(201).json(createdItem);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// @desc    Update gallery image
+// @desc    Update gallery item
 // @route   PUT /api/gallery/:id
 // @access  Private (Admin)
 const updateGalleryImage = async (req, res) => {
   try {
-    const galleryImage = await Gallery.findById(req.params.id);
+    const galleryItem = await Gallery.findById(req.params.id);
 
-    if (!galleryImage) {
-      return res.status(404).json({ message: "Gallery image not found" });
+    if (!galleryItem) {
+      return res.status(404).json({ message: "Gallery item not found" });
     }
 
-    const { title, description, category, isActive } = req.body;
+    const { title, description, category, isActive, type } = req.body;
 
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "gicheha-farm/gallery",
-      });
-      galleryImage.image = result.secure_url;
+      const itemType = type || galleryItem.type;
+      let result;
+
+      if (itemType === "video") {
+        result = await cloudinary.uploader.upload(req.file.path, {
+          folder: "gicheha-farm/gallery/videos",
+          resource_type: "video",
+        });
+        galleryItem.video = result.secure_url;
+        galleryItem.image = null; // Clear image if switching to video
+      } else {
+        result = await cloudinary.uploader.upload(req.file.path, {
+          folder: "gicheha-farm/gallery/images",
+        });
+        galleryItem.image = result.secure_url;
+        galleryItem.video = null; // Clear video if switching to image
+      }
     }
 
-    galleryImage.title = title !== undefined ? title : galleryImage.title;
-    galleryImage.description =
-      description !== undefined ? description : galleryImage.description;
-    galleryImage.category =
-      category !== undefined ? category : galleryImage.category;
-    galleryImage.isActive =
-      isActive !== undefined ? isActive : galleryImage.isActive;
+    galleryItem.title = title !== undefined ? title : galleryItem.title;
+    galleryItem.description =
+      description !== undefined ? description : galleryItem.description;
+    galleryItem.category =
+      category !== undefined ? category : galleryItem.category;
+    galleryItem.type = type !== undefined ? type : galleryItem.type;
+    galleryItem.isActive =
+      isActive !== undefined ? isActive : galleryItem.isActive;
 
-    const updatedImage = await galleryImage.save();
-    res.json(updatedImage);
+    const updatedItem = await galleryItem.save();
+    res.json(updatedItem);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// @desc    Delete gallery image
+// @desc    Delete gallery item
 // @route   DELETE /api/gallery/:id
 // @access  Private (Admin)
 const deleteGalleryImage = async (req, res) => {
   try {
-    const galleryImage = await Gallery.findById(req.params.id);
+    const galleryItem = await Gallery.findById(req.params.id);
 
-    if (!galleryImage) {
-      return res.status(404).json({ message: "Gallery image not found" });
+    if (!galleryItem) {
+      return res.status(404).json({ message: "Gallery item not found" });
     }
 
-    await galleryImage.deleteOne();
-    res.json({ message: "Gallery image removed" });
+    await galleryItem.deleteOne();
+    res.json({ message: "Gallery item removed" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

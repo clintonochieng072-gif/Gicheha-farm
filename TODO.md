@@ -1,27 +1,25 @@
-# TODO: Add Admin Management for Why Choose Us and About Sections
+# TODO: Add Password Reset and Admin Credential Management
 
-## Backend Tasks
+## Backend Changes
 
-- [x] Create Feature model for Why Choose Us section
-- [x] Create About model for About section (History, Mission, Values)
-- [x] Create featureController.js with CRUD operations
-- [x] Create aboutController.js with CRUD operations
-- [x] Create featureRoutes.js for API endpoints
-- [x] Create aboutRoutes.js for API endpoints
-- [x] Update server.js to include new routes
-- [x] Update seed.js to add initial data if needed
+- [x] Add password reset token fields to Admin model (resetToken, resetTokenExpiry)
+- [x] Install nodemailer for email sending
+- [x] Add password reset routes: request reset, verify token, reset password
+- [x] Add admin credential update route (change password/email)
 
-## Frontend Tasks
+## Frontend Changes
 
-- [x] Update AdminDashboard.js to add new tabs for "Why Choose Us" and "About"
-- [x] Add form handling for Feature management (title, description, icon)
-- [x] Add form handling for About management (section, title, content)
-- [x] Update Home.js to fetch features and about data from API instead of hardcoded content
-- [x] Update Home.js to display dynamic content for Why Choose Us and About sections
+- [x] Add "Forgot Password" button to AdminLogin component
+- [x] Create ForgotPassword component with email input
+- [x] Create ResetPassword component for new password entry
+- [x] Add "Change Credentials" section to AdminDashboard
+
+## Configuration
+
+- [x] Configure email service settings (Gmail SMTP or similar)
 
 ## Testing
 
-- [ ] Test admin CRUD operations for features
-- [ ] Test admin CRUD operations for about content
-- [ ] Test public homepage displays updated content
-- [ ] Verify integration between admin and public views
+- [x] Test email sending functionality
+- [x] Test password reset flow
+- [x] Test credential update functionality
