@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FaBars, FaTimes, FaLeaf, FaShoppingCart } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
+import SocialMediaIcons from "./SocialMediaIcons";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [logo, setLogo] = useState(null);
+  const [socialMedia, setSocialMedia] = useState([]);
   const location = useLocation();
   const { getTotalItems } = useCart();
 
@@ -22,7 +24,20 @@ const Header = () => {
       }
     };
 
+    const fetchSocialMedia = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/social-media");
+        if (response.ok) {
+          const socialMediaData = await response.json();
+          setSocialMedia(socialMediaData);
+        }
+      } catch (error) {
+        console.error("Error fetching social media:", error);
+      }
+    };
+
     fetchLogo();
+    fetchSocialMedia();
   }, []);
 
   const navigation = [
@@ -38,6 +53,17 @@ const Header = () => {
   return (
     <header className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Social Media Icons at the top */}
+        {socialMedia.length > 0 && (
+          <div className="flex justify-center py-2 border-b border-secondary-200">
+            <SocialMediaIcons
+              socialMedia={socialMedia}
+              className="justify-center"
+              iconSize="h-5 w-5"
+            />
+          </div>
+        )}
+
         <div className="flex justify-between items-center h-28">
           {/* Left side - empty for balance */}
           <div className="flex-1"></div>

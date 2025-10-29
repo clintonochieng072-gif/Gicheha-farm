@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import ProductCard from "../components/ProductCard";
 import TestimonialCard from "../components/TestimonialCard";
+import VideoCard from "../components/VideoCard";
+import SocialMediaIcons from "../components/SocialMediaIcons";
 import {
   FaLeaf,
   FaTruck,
@@ -24,6 +26,9 @@ const Home = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [features, setFeatures] = useState([]);
   const [abouts, setAbouts] = useState([]);
+  const [videos, setVideos] = useState([]);
+  const [socialMedia, setSocialMedia] = useState([]);
+  const [team, setTeam] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -33,13 +38,23 @@ const Home = () => {
 
   const fetchData = async () => {
     try {
-      const [productsRes, testimonialsRes, featuresRes, aboutsRes] =
-        await Promise.all([
-          axios.get("/api/products"),
-          axios.get("/api/testimonials"),
-          axios.get("/api/features"),
-          axios.get("/api/about"),
-        ]);
+      const [
+        productsRes,
+        testimonialsRes,
+        featuresRes,
+        aboutsRes,
+        videosRes,
+        socialMediaRes,
+        teamRes,
+      ] = await Promise.all([
+        axios.get("/api/products"),
+        axios.get("/api/testimonials"),
+        axios.get("/api/features"),
+        axios.get("/api/about"),
+        axios.get("/api/gallery"),
+        axios.get("/api/social-media"),
+        axios.get("/api/team"),
+      ]);
 
       // Get first 12 products for homepage display
       setFeaturedProducts(productsRes.data.slice(0, 12));
@@ -49,6 +64,13 @@ const Home = () => {
       setFeatures(featuresRes.data);
       // Get about content
       setAbouts(aboutsRes.data);
+      // Get videos (filter only videos and get first 6)
+      const videoItems = videosRes.data.filter((item) => item.type === "video");
+      setVideos(videoItems.slice(0, 6));
+      // Get social media links
+      setSocialMedia(socialMediaRes.data);
+      // Get team members
+      setTeam(teamRes.data);
       // Store total products count for display
       setTotalProducts(productsRes.data.length);
     } catch (error) {
@@ -323,6 +345,33 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Videos Section */}
+      {videos.length > 0 && (
+        <section className="py-16 bg-secondary-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-secondary-800 mb-4">
+                Farm Videos
+              </h2>
+              <p className="text-secondary-600 max-w-2xl mx-auto">
+                Take a closer look at our farm operations, sustainable
+                practices, and the journey from farm to table.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {videos.map((video) => (
+                <VideoCard key={video._id} video={video} />
+              ))}
+            </div>
+            <div className="text-center mt-8">
+              <Link to="/public/gallery" className="btn-secondary">
+                View All Videos & Images
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Featured Products */}
       <section className="py-16 bg-secondary-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -406,10 +455,13 @@ const Home = () => {
                     Gicheha Farm Rongai
                   </h3>
                   <p className="text-secondary-600 leading-relaxed">
-                    Our farm is situated in the heart of Rongai, providing easy
-                    access to fresh, organic produce. We pride ourselves on
-                    sustainable farming practices that benefit both our
-                    community and the environment.
+                    {abouts
+                      .filter(
+                        (about) => about.section === "history" && about.isActive
+                      )
+                      .map((about) => about.content)
+                      .join(" ") ||
+                      "Our farm is situated in the heart of Rongai, providing easy access to fresh, organic produce. We pride ourselves on sustainable farming practices that benefit both our community and the environment."}
                   </p>
                 </div>
               </div>
@@ -456,6 +508,47 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Team Section */}
+      {team.length > 0 && (
+        <section className="py-16 bg-secondary-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-secondary-800 mb-4">
+                Meet Our Team
+              </h2>
+              <p className="text-secondary-600 max-w-2xl mx-auto">
+                Get to know the dedicated professionals behind Gicheha Farm who
+                work tirelessly to bring you the freshest produce.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {team
+                .filter((member) => member.isActive)
+                .sort((a, b) => a.order - b.order)
+                .map((member) => (
+                  <div
+                    key={member._id}
+                    className="bg-white rounded-lg shadow-md p-6 text-center"
+                  >
+                    <div className="w-24 h-24 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 text-primary-600 font-bold text-2xl">
+                      {member.initials}
+                    </div>
+                    <h3 className="text-xl font-semibold text-secondary-800 mb-2">
+                      {member.name}
+                    </h3>
+                    <p className="text-primary-600 font-medium mb-3">
+                      {member.position}
+                    </p>
+                    <p className="text-secondary-600 text-sm leading-relaxed">
+                      {member.bio}
+                    </p>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Testimonials */}
       <section className="py-16 bg-white">
