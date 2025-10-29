@@ -10,6 +10,8 @@ import Testimonials from "./pages/Testimonials";
 import Gallery from "./pages/Gallery";
 import Admin from "./pages/Admin";
 import Cart from "./components/Cart";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
 
 function App() {
   return (
@@ -18,6 +20,12 @@ function App() {
         <Routes>
           {/* Admin routes - no header/footer */}
           <Route path="/" element={<Admin />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/forgot-password" element={<ForgotPassword />} />
+          <Route
+            path="/admin/reset-password/:token"
+            element={<ResetPassword />}
+          />
           <Route path="/admin/*" element={<Admin />} />
 
           {/* Public routes - with header/footer */}

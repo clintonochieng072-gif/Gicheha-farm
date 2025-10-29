@@ -14,6 +14,7 @@ const logoRoutes = require("./routes/logoRoutes");
 const unitRoutes = require("./routes/unitRoutes");
 const featureRoutes = require("./routes/featureRoutes");
 const aboutRoutes = require("./routes/aboutRoutes");
+const teamRoutes = require("./routes/teamRoutes");
 const path = require("path");
 
 const app = express();
@@ -42,6 +43,7 @@ app.use("/api/logos", logoRoutes);
 app.use("/api/units", unitRoutes);
 app.use("/api/features", featureRoutes);
 app.use("/api/about", aboutRoutes);
+app.use("/api/team", teamRoutes);
 
 // Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

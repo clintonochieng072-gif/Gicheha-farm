@@ -22,7 +22,25 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+// File filter to allow images and videos
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype.startsWith("image/") ||
+    file.mimetype.startsWith("video/")
+  ) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image and video files are allowed!"), false);
+  }
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB limit for videos
+  },
+});
 
 // Validation rules (optional fields)
 const galleryValidation = [
@@ -41,7 +59,7 @@ router.post(
   "/",
   protect,
   admin,
-  upload.single("image"),
+  upload.single("file"),
   galleryValidation,
   createGalleryImage
 );
@@ -49,7 +67,7 @@ router.put(
   "/:id",
   protect,
   admin,
-  upload.single("image"),
+  upload.single("file"),
   galleryValidation,
   updateGalleryImage
 );

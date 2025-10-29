@@ -7,6 +7,7 @@ const Admin = require("./models/Admin");
 const Unit = require("./models/Unit");
 const Feature = require("./models/Feature");
 const About = require("./models/About");
+const Team = require("./models/Team");
 const connectDB = require("./config/database");
 
 // Load environment variables
@@ -208,6 +209,39 @@ const abouts = [
   },
 ];
 
+const teamMembers = [
+  {
+    name: "John Gicheha",
+    position: "Founder & Farmer",
+    bio: "With over 20 years of farming experience, John leads our sustainable farming initiatives.",
+    initials: "JG",
+    image:
+      "https://res.cloudinary.com/demo/image/upload/v1234567890/gicheha-farm/team/john.jpg",
+    isActive: true,
+    order: 1,
+  },
+  {
+    name: "Mary Wanjiku",
+    position: "Farm Manager",
+    bio: "Mary oversees daily operations and ensures our products meet the highest quality standards.",
+    initials: "MW",
+    image:
+      "https://res.cloudinary.com/demo/image/upload/v1234567890/gicheha-farm/team/mary.jpg",
+    isActive: true,
+    order: 2,
+  },
+  {
+    name: "David Kiprop",
+    position: "Quality Control",
+    bio: "David manages our quality assurance processes and product testing.",
+    initials: "DK",
+    image:
+      "https://res.cloudinary.com/demo/image/upload/v1234567890/gicheha-farm/team/david.jpg",
+    isActive: true,
+    order: 3,
+  },
+];
+
 const adminUser = {
   email: "Gicheharongai@gmail.com",
   password: "admin123456",
@@ -222,19 +256,21 @@ const importData = async () => {
     const existingUnits = await Unit.countDocuments();
     const existingFeatures = await Feature.countDocuments();
     const existingAbouts = await About.countDocuments();
+    const existingTeam = await Team.countDocuments();
 
     if (
       existingProducts > 0 ||
       existingAdmins > 0 ||
       existingUnits > 0 ||
       existingFeatures > 0 ||
-      existingAbouts > 0
+      existingAbouts > 0 ||
+      existingTeam > 0
     ) {
       console.log(
         "Data already exists! Skipping seed to preserve existing data."
       );
       console.log(
-        `Found ${existingProducts} products, ${existingAdmins} admin users, ${existingUnits} units, ${existingFeatures} features, and ${existingAbouts} about entries.`
+        `Found ${existingProducts} products, ${existingAdmins} admin users, ${existingUnits} units, ${existingFeatures} features, ${existingAbouts} about entries, and ${existingTeam} team members.`
       );
       process.exit();
     }
@@ -249,6 +285,7 @@ const importData = async () => {
     await Unit.insertMany(units);
     await Feature.insertMany(features);
     await About.insertMany(abouts);
+    await Team.insertMany(teamMembers);
 
     // Create admin user
     const admin = new Admin(adminUser);
@@ -271,6 +308,7 @@ const destroyData = async () => {
     await Unit.deleteMany();
     await Feature.deleteMany();
     await About.deleteMany();
+    await Team.deleteMany();
 
     console.log("Data Destroyed!");
     process.exit();
