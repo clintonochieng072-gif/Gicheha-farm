@@ -17,6 +17,7 @@ const AdminDashboard = ({ token, onLogout }) => {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [currentFormType, setCurrentFormType] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [credentialsForm, setCredentialsForm] = useState({
     currentPassword: "",
@@ -41,48 +42,49 @@ const AdminDashboard = ({ token, onLogout }) => {
 
   useEffect(() => {
     fetchData();
-  }, [activeTab, token]);
+  }, [token]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Always fetch categories and units since they're needed for the products form
-      const categoriesResponse = await api.get("/categories");
+      // Fetch all data simultaneously since all sections are visible
+      const [
+        categoriesResponse,
+        unitsResponse,
+        productsResponse,
+        testimonialsResponse,
+        galleryResponse,
+        socialMediaResponse,
+        logosResponse,
+        featuresResponse,
+        aboutsResponse,
+        teamResponse,
+        videosResponse,
+      ] = await Promise.all([
+        api.get("/categories"),
+        api.get("/units"),
+        api.get("/products"),
+        api.get("/testimonials/admin"),
+        api.get("/gallery"),
+        api.get("/social-media"),
+        api.get("/logos"),
+        api.get("/features/admin"),
+        api.get("/about/admin"),
+        api.get("/team"),
+        api.get("/gallery?type=video"),
+      ]);
+
       setCategories(categoriesResponse.data);
-
-      const unitsResponse = await api.get("/units");
       setUnits(unitsResponse.data);
-
-      if (activeTab === "products") {
-        const response = await api.get("/products");
-        setProducts(response.data);
-      } else if (activeTab === "testimonials") {
-        const response = await api.get("/testimonials/admin");
-        setTestimonials(response.data);
-      } else if (activeTab === "gallery") {
-        const response = await api.get("/gallery");
-        setGallery(response.data);
-      } else if (activeTab === "units") {
-        // Units are already fetched above
-      } else if (activeTab === "social-media") {
-        const response = await api.get("/social-media");
-        setSocialMedia(response.data);
-      } else if (activeTab === "logos") {
-        const response = await api.get("/logos");
-        setLogos(response.data);
-      } else if (activeTab === "why-choose-us") {
-        const response = await api.get("/features/admin");
-        setFeatures(response.data);
-      } else if (activeTab === "about") {
-        const response = await api.get("/about/admin");
-        setAbouts(response.data);
-      } else if (activeTab === "team") {
-        const response = await api.get("/team");
-        setTeam(response.data);
-      } else if (activeTab === "videos") {
-        const response = await api.get("/gallery?type=video");
-        setVideos(response.data);
-      }
+      setProducts(productsResponse.data);
+      setTestimonials(testimonialsResponse.data);
+      setGallery(galleryResponse.data);
+      setSocialMedia(socialMediaResponse.data);
+      setLogos(logosResponse.data);
+      setFeatures(featuresResponse.data);
+      setAbouts(aboutsResponse.data);
+      setTeam(teamResponse.data);
+      setVideos(videosResponse.data);
     } catch (error) {
       console.error("Error fetching data:", error);
       // If token is invalid, logout
@@ -138,6 +140,7 @@ const AdminDashboard = ({ token, onLogout }) => {
 
   const handleAddNew = (type) => {
     setEditingItem(null);
+    setCurrentFormType(type);
     setFormData({
       name: "",
       description: "",
@@ -156,12 +159,14 @@ const AdminDashboard = ({ token, onLogout }) => {
       icon: "",
       section: "",
       content: "",
+      type: type === "videos" ? "video" : type === "gallery" ? "image" : "",
     });
     setShowAddForm(true);
   };
 
   const handleEdit = (item, type) => {
     setEditingItem({ ...item, type });
+    setCurrentFormType(type);
     setFormData({
       name: item.name || "",
       description: item.description || "",
@@ -328,35 +333,35 @@ const AdminDashboard = ({ token, onLogout }) => {
         }
       } else {
         // Create new item
-        if (activeTab === "products") {
+        if (currentFormType === "products") {
           response = await api.post("/products", formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
           });
-        } else if (activeTab === "testimonials") {
+        } else if (currentFormType === "testimonials") {
           response = await api.post("/testimonials", formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
           });
-        } else if (activeTab === "gallery") {
+        } else if (currentFormType === "gallery") {
           // Add type to formData for gallery creation
           formDataToSend.append("type", formData.type || "image");
           response = await api.post("/gallery", formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
           });
-        } else if (activeTab === "categories") {
+        } else if (currentFormType === "categories") {
           // Categories don't need FormData, send JSON
           const categoryData = {
             name: formData.name,
             isActive: formData.isActive,
           };
           response = await api.post("/categories", categoryData);
-        } else if (activeTab === "units") {
+        } else if (currentFormType === "units") {
           // Units don't need FormData, send JSON
           const unitData = {
             name: formData.name,
             isActive: formData.isActive,
           };
           response = await api.post("/units", unitData);
-        } else if (activeTab === "social-media") {
+        } else if (currentFormType === "social-media") {
           // Social media doesn't need FormData, send JSON
           const socialMediaData = {
             platform: formData.platform,
@@ -364,11 +369,11 @@ const AdminDashboard = ({ token, onLogout }) => {
             isActive: formData.isActive,
           };
           response = await api.post("/social-media", socialMediaData);
-        } else if (activeTab === "logos") {
+        } else if (currentFormType === "logos") {
           response = await api.post("/logos", formDataToSend, {
             headers: { "Content-Type": "multipart/form-data" },
           });
-        } else if (activeTab === "why-choose-us") {
+        } else if (currentFormType === "why-choose-us") {
           // Features don't need FormData, send JSON
           const featureData = {
             title: formData.title,
@@ -377,7 +382,7 @@ const AdminDashboard = ({ token, onLogout }) => {
             isActive: formData.isActive,
           };
           response = await api.post("/features", featureData);
-        } else if (activeTab === "about") {
+        } else if (currentFormType === "about") {
           // About doesn't need FormData, send JSON
           const aboutData = {
             section: formData.section,
@@ -386,7 +391,7 @@ const AdminDashboard = ({ token, onLogout }) => {
             isActive: formData.isActive,
           };
           response = await api.post("/about", aboutData);
-        } else if (activeTab === "videos") {
+        } else if (currentFormType === "videos") {
           // Video creation with FormData
           const videoData = new FormData();
           videoData.append("title", formData.title);
@@ -399,7 +404,7 @@ const AdminDashboard = ({ token, onLogout }) => {
           response = await api.post("/gallery", videoData, {
             headers: { "Content-Type": "multipart/form-data" },
           });
-        } else if (activeTab === "team") {
+        } else if (currentFormType === "team") {
           // Team member creation with FormData for image
           const teamData = new FormData();
           teamData.append("name", formData.name);
@@ -497,19 +502,19 @@ const AdminDashboard = ({ token, onLogout }) => {
     }));
   };
 
-  const tabs = [
-    { id: "products", name: "Products" },
-    { id: "testimonials", name: "Testimonials" },
-    { id: "gallery", name: "Gallery" },
-    { id: "videos", name: "Videos" },
-    { id: "categories", name: "Categories" },
-    { id: "units", name: "Units" },
-    { id: "social-media", name: "Social Media" },
-    { id: "logos", name: "Logos" },
-    { id: "why-choose-us", name: "Why Choose Us" },
-    { id: "about", name: "About" },
-    { id: "team", name: "Team" },
-    { id: "credentials", name: "Credentials" },
+  const sections = [
+    { id: "products", name: "Products", type: "management" },
+    { id: "testimonials", name: "Testimonials", type: "management" },
+    { id: "gallery", name: "Gallery", type: "media" },
+    { id: "videos", name: "Videos", type: "media" },
+    { id: "categories", name: "Categories", type: "config" },
+    { id: "units", name: "Units", type: "config" },
+    { id: "social-media", name: "Social Media", type: "config" },
+    { id: "logos", name: "Logos", type: "config" },
+    { id: "why-choose-us", name: "Why Choose Us", type: "content" },
+    { id: "about", name: "About", type: "content" },
+    { id: "team", name: "Team", type: "content" },
+    { id: "credentials", name: "Credentials", type: "admin" },
   ];
 
   const handleLogout = async () => {
@@ -579,23 +584,639 @@ const AdminDashboard = ({ token, onLogout }) => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="border-b border-secondary-200 mb-8">
-        <nav className="-mb-px flex space-x-8">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.id
-                  ? "border-primary-500 text-primary-600"
-                  : "border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300"
-              }`}
-            >
-              {tab.name}
-            </button>
-          ))}
-        </nav>
+      {/* Section Headers */}
+      <div className="space-y-8">
+        {/* Management Section */}
+        <div>
+          <h2 className="text-2xl font-semibold text-secondary-800 mb-4">
+            Management
+          </h2>
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium">Products</h3>
+                <button
+                  onClick={() => handleAddNew("products")}
+                  className="btn-primary text-sm"
+                >
+                  Add Product
+                </button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {products.slice(0, 4).map((product) => (
+                  <div key={product._id} className="border rounded p-3">
+                    <img
+                      src={
+                        product.images && product.images.length > 0
+                          ? product.images[0]
+                          : "https://via.placeholder.com/100x75?text=No+Image"
+                      }
+                      alt={product.name}
+                      className="w-full h-16 object-cover rounded mb-2"
+                    />
+                    <h4 className="font-medium text-sm truncate">
+                      {product.name}
+                    </h4>
+                    <p className="text-secondary-600 text-xs">
+                      KSh {product.price}
+                    </p>
+                    <div className="flex space-x-1 mt-2">
+                      <button
+                        onClick={() => handleEdit(product, "product")}
+                        className="text-xs text-primary-600 hover:text-primary-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete("product", product._id)}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {products.length > 4 && (
+                <p className="text-sm text-secondary-500 mt-2">
+                  And {products.length - 4} more...
+                </p>
+              )}
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium">Testimonials</h3>
+                <button
+                  onClick={() => handleAddNew("testimonials")}
+                  className="btn-primary text-sm"
+                >
+                  Add Testimonial
+                </button>
+              </div>
+              <div className="space-y-3">
+                {testimonials.slice(0, 3).map((testimonial) => (
+                  <div key={testimonial._id} className="border rounded p-3">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="font-medium text-sm">
+                        {testimonial.name}
+                      </span>
+                      <span
+                        className={`px-2 py-1 text-xs rounded ${
+                          testimonial.isApproved
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {testimonial.isApproved ? "Approved" : "Pending"}
+                      </span>
+                    </div>
+                    <p className="text-secondary-600 text-xs line-clamp-2">
+                      {testimonial.message}
+                    </p>
+                    <div className="flex space-x-1 mt-2">
+                      {!testimonial.isApproved && (
+                        <button
+                          onClick={() =>
+                            handleApproveTestimonial(testimonial._id)
+                          }
+                          className="text-xs text-green-600 hover:text-green-800"
+                        >
+                          Approve
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleEdit(testimonial, "testimonial")}
+                        className="text-xs text-primary-600 hover:text-primary-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDelete("testimonial", testimonial._id)
+                        }
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {testimonials.length > 3 && (
+                <p className="text-sm text-secondary-500 mt-2">
+                  And {testimonials.length - 3} more...
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Media Section */}
+        <div>
+          <h2 className="text-2xl font-semibold text-secondary-800 mb-4">
+            Media
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium">Gallery</h3>
+                <button
+                  onClick={() => handleAddNew("gallery")}
+                  className="btn-primary text-sm"
+                >
+                  Add Image
+                </button>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {gallery.slice(0, 6).map((item) => (
+                  <div key={item._id} className="border rounded p-2">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-16 object-cover rounded mb-1"
+                    />
+                    <p className="text-xs truncate">{item.title}</p>
+                    <div className="flex space-x-1 mt-1">
+                      <button
+                        onClick={() => handleEdit(item, "gallery")}
+                        className="text-xs text-primary-600 hover:text-primary-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete("gallery", item._id)}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Del
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {gallery.length > 6 && (
+                <p className="text-sm text-secondary-500 mt-2">
+                  And {gallery.length - 6} more...
+                </p>
+              )}
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium">Videos</h3>
+                <button
+                  onClick={() => handleAddNew("videos")}
+                  className="btn-primary text-sm"
+                >
+                  Add Video
+                </button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {videos.slice(0, 4).map((video) => (
+                  <div key={video._id} className="border rounded p-2">
+                    <video
+                      src={video.video}
+                      className="w-full h-16 object-cover rounded mb-1"
+                    />
+                    <p className="text-xs truncate">{video.title}</p>
+                    <div className="flex space-x-1 mt-1">
+                      <button
+                        onClick={() => handleEdit(video, "video")}
+                        className="text-xs text-primary-600 hover:text-primary-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete("gallery", video._id)}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Del
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {videos.length > 4 && (
+                <p className="text-sm text-secondary-500 mt-2">
+                  And {videos.length - 4} more...
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Configuration Section */}
+        <div>
+          <h2 className="text-2xl font-semibold text-secondary-800 mb-4">
+            Configuration
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-md font-medium">Categories</h3>
+                <button
+                  onClick={() => handleAddNew("categories")}
+                  className="btn-primary text-xs"
+                >
+                  Add
+                </button>
+              </div>
+              <div className="space-y-2">
+                {categories.slice(0, 3).map((category) => (
+                  <div
+                    key={category._id}
+                    className="flex justify-between items-center"
+                  >
+                    <span className="text-sm">{category.name}</span>
+                    <div className="flex space-x-1">
+                      <button
+                        onClick={() => handleEdit(category, "category")}
+                        className="text-xs text-primary-600 hover:text-primary-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete("category", category._id)}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Del
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {categories.length > 3 && (
+                <p className="text-xs text-secondary-500 mt-2">
+                  And {categories.length - 3} more...
+                </p>
+              )}
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-md font-medium">Units</h3>
+                <button
+                  onClick={() => handleAddNew("units")}
+                  className="btn-primary text-xs"
+                >
+                  Add
+                </button>
+              </div>
+              <div className="space-y-2">
+                {units.slice(0, 3).map((unit) => (
+                  <div
+                    key={unit._id}
+                    className="flex justify-between items-center"
+                  >
+                    <span className="text-sm">{unit.name}</span>
+                    <div className="flex space-x-1">
+                      <button
+                        onClick={() => handleEdit(unit, "unit")}
+                        className="text-xs text-primary-600 hover:text-primary-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete("unit", unit._id)}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Del
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {units.length > 3 && (
+                <p className="text-xs text-secondary-500 mt-2">
+                  And {units.length - 3} more...
+                </p>
+              )}
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-md font-medium">Social Media</h3>
+                <button
+                  onClick={() => handleAddNew("social-media")}
+                  className="btn-primary text-xs"
+                >
+                  Add
+                </button>
+              </div>
+              <div className="space-y-2">
+                {socialMedia.slice(0, 3).map((social) => (
+                  <div
+                    key={social._id}
+                    className="flex justify-between items-center"
+                  >
+                    <span className="text-sm capitalize">
+                      {social.platform}
+                    </span>
+                    <div className="flex space-x-1">
+                      <button
+                        onClick={() => handleEdit(social, "social-media")}
+                        className="text-xs text-primary-600 hover:text-primary-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete("social-media", social._id)}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Del
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {socialMedia.length > 3 && (
+                <p className="text-xs text-secondary-500 mt-2">
+                  And {socialMedia.length - 3} more...
+                </p>
+              )}
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-md font-medium">Logos</h3>
+                <button
+                  onClick={() => handleAddNew("logos")}
+                  className="btn-primary text-xs"
+                >
+                  Add
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {logos.slice(0, 4).map((logo) => (
+                  <div key={logo._id} className="border rounded p-1">
+                    <img
+                      src={logo.url}
+                      alt={logo.name}
+                      className="w-full h-8 object-contain"
+                    />
+                    <div className="flex space-x-1 mt-1">
+                      <button
+                        onClick={() => handleEdit(logo, "logo")}
+                        className="text-xs text-primary-600 hover:text-primary-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete("logo", logo._id)}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Del
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {logos.length > 4 && (
+                <p className="text-xs text-secondary-500 mt-2">
+                  And {logos.length - 4} more...
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div>
+          <h2 className="text-2xl font-semibold text-secondary-800 mb-4">
+            Content
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium">Why Choose Us</h3>
+                <button
+                  onClick={() => handleAddNew("why-choose-us")}
+                  className="btn-primary text-sm"
+                >
+                  Add Feature
+                </button>
+              </div>
+              <div className="space-y-3">
+                {features.slice(0, 3).map((feature) => (
+                  <div key={feature._id} className="border rounded p-3">
+                    <h4 className="font-medium text-sm">{feature.title}</h4>
+                    <p className="text-secondary-600 text-xs line-clamp-2">
+                      {feature.description}
+                    </p>
+                    <div className="flex space-x-1 mt-2">
+                      <button
+                        onClick={() => handleEdit(feature, "feature")}
+                        className="text-xs text-primary-600 hover:text-primary-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete("feature", feature._id)}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {features.length > 3 && (
+                <p className="text-sm text-secondary-500 mt-2">
+                  And {features.length - 3} more...
+                </p>
+              )}
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium">About</h3>
+                <button
+                  onClick={() => handleAddNew("about")}
+                  className="btn-primary text-sm"
+                >
+                  Add Content
+                </button>
+              </div>
+              <div className="space-y-3">
+                {abouts.slice(0, 3).map((about) => (
+                  <div key={about._id} className="border rounded p-3">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="font-medium text-sm capitalize">
+                        {about.section}
+                      </span>
+                      <span
+                        className={`px-2 py-1 text-xs rounded ${
+                          about.isActive
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {about.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+                    <h4 className="font-medium text-sm">{about.title}</h4>
+                    <p className="text-secondary-600 text-xs line-clamp-2">
+                      {about.content}
+                    </p>
+                    <div className="flex space-x-1 mt-2">
+                      <button
+                        onClick={() => handleEdit(about, "about")}
+                        className="text-xs text-primary-600 hover:text-primary-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete("about", about._id)}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {abouts.length > 3 && (
+                <p className="text-sm text-secondary-500 mt-2">
+                  And {abouts.length - 3} more...
+                </p>
+              )}
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium">Team</h3>
+                <button
+                  onClick={() => handleAddNew("team")}
+                  className="btn-primary text-sm"
+                >
+                  Add Member
+                </button>
+              </div>
+              <div className="space-y-3">
+                {team.slice(0, 3).map((member) => (
+                  <div key={member._id} className="border rounded p-3">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-sm">
+                        {member.initials}
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-sm">{member.name}</h4>
+                        <p className="text-secondary-600 text-xs">
+                          {member.position}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex space-x-1">
+                      <button
+                        onClick={() => handleEdit(member, "team")}
+                        className="text-xs text-primary-600 hover:text-primary-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete("team", member._id)}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {team.length > 3 && (
+                <p className="text-sm text-secondary-500 mt-2">
+                  And {team.length - 3} more...
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Admin Section */}
+        <div>
+          <h2 className="text-2xl font-semibold text-secondary-800 mb-4">
+            Admin
+          </h2>
+          <div className="max-w-md">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+              <h3 className="text-lg font-medium mb-4">
+                Credentials Management
+              </h3>
+              <form onSubmit={handleCredentialsUpdate}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-secondary-700 mb-2">
+                    Current Password
+                  </label>
+                  <input
+                    type="password"
+                    value={credentialsForm.currentPassword}
+                    onChange={(e) =>
+                      setCredentialsForm((prev) => ({
+                        ...prev,
+                        currentPassword: e.target.value,
+                      }))
+                    }
+                    className="input-field"
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-secondary-700 mb-2">
+                    New Email (Optional)
+                  </label>
+                  <input
+                    type="email"
+                    value={credentialsForm.newEmail}
+                    onChange={(e) =>
+                      setCredentialsForm((prev) => ({
+                        ...prev,
+                        newEmail: e.target.value,
+                      }))
+                    }
+                    className="input-field"
+                    placeholder="Leave empty to keep current email"
+                  />
+                </div>
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-secondary-700 mb-2">
+                    New Password (Optional)
+                  </label>
+                  <input
+                    type="password"
+                    value={credentialsForm.newPassword}
+                    onChange={(e) =>
+                      setCredentialsForm((prev) => ({
+                        ...prev,
+                        newPassword: e.target.value,
+                      }))
+                    }
+                    className="input-field"
+                    placeholder="Leave empty to keep current password"
+                    minLength={6}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full btn-primary"
+                  disabled={credentialsLoading}
+                >
+                  {credentialsLoading ? "Updating..." : "Update Credentials"}
+                </button>
+              </form>
+              {credentialsMessage && (
+                <div
+                  className={`mt-4 px-4 py-3 rounded ${
+                    credentialsMessage.includes("success")
+                      ? "bg-green-100 border border-green-400 text-green-700"
+                      : "bg-red-100 border border-red-400 text-red-700"
+                  }`}
+                >
+                  {credentialsMessage}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Add/Edit Form */}
@@ -604,11 +1225,11 @@ const AdminDashboard = ({ token, onLogout }) => {
           <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-96 overflow-y-auto">
             <h3 className="text-xl font-semibold mb-4">
               {editingItem
-                ? `Edit ${activeTab.slice(0, -1)}`
-                : `Add New ${activeTab.slice(0, -1)}`}
+                ? `Edit ${currentFormType.slice(0, -1)}`
+                : `Add New ${currentFormType.slice(0, -1)}`}
             </h3>
             <form onSubmit={handleFormSubmit} className="space-y-4">
-              {activeTab === "products" && (
+              {currentFormType === "products" && (
                 <>
                   <input
                     type="text"
@@ -693,7 +1314,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </>
               )}
 
-              {activeTab === "testimonials" && (
+              {currentFormType === "testimonials" && (
                 <>
                   <input
                     type="text"
@@ -734,7 +1355,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </>
               )}
 
-              {activeTab === "gallery" && (
+              {currentFormType === "gallery" && (
                 <>
                   <select
                     name="type"
@@ -786,7 +1407,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </>
               )}
 
-              {activeTab === "videos" && (
+              {currentFormType === "videos" && (
                 <>
                   <input
                     type="text"
@@ -825,7 +1446,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </>
               )}
 
-              {activeTab === "categories" && (
+              {currentFormType === "categories" && (
                 <>
                   <input
                     type="text"
@@ -851,7 +1472,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </>
               )}
 
-              {activeTab === "units" && (
+              {currentFormType === "units" && (
                 <>
                   <input
                     type="text"
@@ -877,7 +1498,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </>
               )}
 
-              {activeTab === "social-media" && (
+              {currentFormType === "social-media" && (
                 <>
                   <select
                     name="platform"
@@ -946,7 +1567,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </>
               )}
 
-              {activeTab === "logos" && (
+              {currentFormType === "logos" && (
                 <>
                   <input
                     type="text"
@@ -979,7 +1600,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </>
               )}
 
-              {activeTab === "why-choose-us" && (
+              {currentFormType === "why-choose-us" && (
                 <>
                   <input
                     type="text"
@@ -1031,7 +1652,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </>
               )}
 
-              {activeTab === "about" && (
+              {currentFormType === "about" && (
                 <>
                   <select
                     name="section"
@@ -1076,7 +1697,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </>
               )}
 
-              {activeTab === "team" && (
+              {currentFormType === "team" && (
                 <>
                   <input
                     type="text"
@@ -1161,705 +1782,6 @@ const AdminDashboard = ({ token, onLogout }) => {
             </form>
           </div>
         </div>
-      )}
-
-      {/* Content */}
-      {loading ? (
-        <div className="text-center py-8">Loading...</div>
-      ) : (
-        <>
-          {activeTab === "products" && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">Products Management</h2>
-                <button
-                  onClick={() => handleAddNew("product")}
-                  className="btn-primary"
-                >
-                  Add New Product
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.map((product) => (
-                  <div key={product._id} className="card">
-                    <img
-                      src={
-                        product.images && product.images.length > 0
-                          ? product.images[0]
-                          : "https://via.placeholder.com/300x200?text=No+Image"
-                      }
-                      alt={product.name}
-                      className="w-full h-32 object-contain rounded-t-lg"
-                    />
-                    <div className="p-4">
-                      <h3 className="font-semibold">{product.name}</h3>
-                      <p className="text-secondary-600 text-sm">
-                        KSh {product.price}
-                      </p>
-                      <div className="flex space-x-2 mt-3">
-                        <button
-                          onClick={() => handleEdit(product, "product")}
-                          className="btn-secondary text-xs"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete("product", product._id)}
-                          className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
-                        >
-                          Remove Product
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "testimonials" && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">
-                  Testimonials Management
-                </h2>
-                <button
-                  onClick={() => handleAddNew("testimonial")}
-                  className="btn-primary"
-                >
-                  Add Testimonial
-                </button>
-              </div>
-              <div className="space-y-4">
-                {testimonials.map((testimonial) => (
-                  <div key={testimonial._id} className="card">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <span className="font-semibold">
-                            {testimonial.name}
-                          </span>
-                          <span
-                            className={`px-2 py-1 text-xs rounded ${
-                              testimonial.isApproved
-                                ? "bg-green-100 text-green-800"
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}
-                          >
-                            {testimonial.isApproved ? "Approved" : "Pending"}
-                          </span>
-                        </div>
-                        <p className="text-secondary-600">
-                          {testimonial.message}
-                        </p>
-                      </div>
-                      <div className="flex space-x-2 ml-4">
-                        {!testimonial.isApproved && (
-                          <button
-                            onClick={() =>
-                              handleApproveTestimonial(testimonial._id)
-                            }
-                            className="btn-primary text-xs"
-                          >
-                            Approve
-                          </button>
-                        )}
-                        <button
-                          onClick={() =>
-                            handleDelete("testimonial", testimonial._id)
-                          }
-                          className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "gallery" && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">Gallery Management</h2>
-                <button
-                  onClick={() => handleAddNew("gallery")}
-                  className="btn-primary"
-                >
-                  Add New Item
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {gallery.map((item) => (
-                  <div key={item._id} className="card">
-                    {item.type === "video" ? (
-                      <video
-                        src={item.video}
-                        className="w-full h-32 object-cover rounded-t-lg"
-                        controls
-                      />
-                    ) : (
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-full h-32 object-cover rounded-t-lg"
-                      />
-                    )}
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold">{item.title}</h3>
-                        <span
-                          className={`px-2 py-1 text-xs rounded ${
-                            item.type === "video"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-green-100 text-green-800"
-                          }`}
-                        >
-                          {item.type}
-                        </span>
-                      </div>
-                      <div className="flex space-x-2 mt-3">
-                        <button
-                          onClick={() => handleEdit(item, "gallery")}
-                          className="btn-secondary text-xs"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete("gallery", item._id)}
-                          className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "categories" && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">
-                  Categories Management
-                </h2>
-                <button
-                  onClick={() => handleAddNew("category")}
-                  className="btn-primary"
-                >
-                  Add New Category
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {categories.map((category) => (
-                  <div key={category._id} className="card">
-                    <div className="p-4">
-                      <h3 className="font-semibold">{category.name}</h3>
-                      <div className="flex items-center justify-between mt-3">
-                        <span
-                          className={`px-2 py-1 text-xs rounded ${
-                            category.isActive
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {category.isActive ? "Active" : "Inactive"}
-                        </span>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleEdit(category, "category")}
-                            className="btn-secondary text-xs"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleDelete("category", category._id)
-                            }
-                            className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "units" && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">Units Management</h2>
-                <button
-                  onClick={() => handleAddNew("unit")}
-                  className="btn-primary"
-                >
-                  Add New Unit
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {units.map((unit) => (
-                  <div key={unit._id} className="card">
-                    <div className="p-4">
-                      <h3 className="font-semibold">{unit.name}</h3>
-                      <div className="flex items-center justify-between mt-3">
-                        <span
-                          className={`px-2 py-1 text-xs rounded ${
-                            unit.isActive
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {unit.isActive ? "Active" : "Inactive"}
-                        </span>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleEdit(unit, "unit")}
-                            className="btn-secondary text-xs"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete("unit", unit._id)}
-                            className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "social-media" && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">
-                  Social Media Management
-                </h2>
-                <button
-                  onClick={() => handleAddNew("social-media")}
-                  className="btn-primary"
-                >
-                  Add Social Media
-                </button>
-              </div>
-              <div className="space-y-4">
-                {socialMedia.map((social) => (
-                  <div key={social._id} className="card">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center space-x-3">
-                        <a
-                          href={social.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-semibold capitalize text-primary-600 hover:text-primary-800 cursor-pointer"
-                        >
-                          {social.platform}
-                        </a>
-                        <a
-                          href={social.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary-600 hover:text-primary-800"
-                        >
-                          {social.url}
-                        </a>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span
-                          className={`px-2 py-1 text-xs rounded ${
-                            social.isActive
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {social.isActive ? "Active" : "Inactive"}
-                        </span>
-                        <button
-                          onClick={() => handleEdit(social, "social-media")}
-                          className="btn-secondary text-xs"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleDelete("social-media", social._id)
-                          }
-                          className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "logos" && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">Logo Management</h2>
-                <button
-                  onClick={() => handleAddNew("logo")}
-                  className="btn-primary"
-                >
-                  Add New Logo
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {logos.map((logo) => (
-                  <div key={logo._id} className="card">
-                    <img
-                      src={logo.url}
-                      alt={logo.name}
-                      className="w-full h-32 object-contain rounded-t-lg"
-                    />
-                    <div className="p-4">
-                      <h3 className="font-semibold">{logo.name}</h3>
-                      <div className="flex items-center justify-between mt-3">
-                        <span
-                          className={`px-2 py-1 text-xs rounded ${
-                            logo.isActive
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {logo.isActive ? "Active" : "Inactive"}
-                        </span>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleEdit(logo, "logo")}
-                            className="btn-secondary text-xs"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete("logo", logo._id)}
-                            className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "why-choose-us" && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">
-                  Why Choose Us Management
-                </h2>
-                <button
-                  onClick={() => handleAddNew("feature")}
-                  className="btn-primary"
-                >
-                  Add New Feature
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {features.map((feature) => (
-                  <div key={feature._id} className="card">
-                    <div className="p-4">
-                      <h3 className="font-semibold">{feature.title}</h3>
-                      <p className="text-secondary-600 text-sm mt-2">
-                        {feature.description}
-                      </p>
-                      <div className="flex items-center justify-between mt-3">
-                        <span
-                          className={`px-2 py-1 text-xs rounded ${
-                            feature.isActive
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {feature.isActive ? "Active" : "Inactive"}
-                        </span>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleEdit(feature, "feature")}
-                            className="btn-secondary text-xs"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete("feature", feature._id)}
-                            className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "about" && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">About Management</h2>
-                <button
-                  onClick={() => handleAddNew("about")}
-                  className="btn-primary"
-                >
-                  Add New About Content
-                </button>
-              </div>
-              <div className="space-y-4">
-                {abouts.map((about) => (
-                  <div key={about._id} className="card">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <span className="font-semibold capitalize">
-                            {about.section}
-                          </span>
-                          <span
-                            className={`px-2 py-1 text-xs rounded ${
-                              about.isActive
-                                ? "bg-green-100 text-green-800"
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}
-                          >
-                            {about.isActive ? "Active" : "Inactive"}
-                          </span>
-                        </div>
-                        <h3 className="font-medium">{about.title}</h3>
-                        <p className="text-secondary-600 mt-2">
-                          {about.content}
-                        </p>
-                      </div>
-                      <div className="flex space-x-2 ml-4">
-                        <button
-                          onClick={() => handleEdit(about, "about")}
-                          className="btn-secondary text-xs"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete("about", about._id)}
-                          className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "videos" && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">Videos Management</h2>
-                <button
-                  onClick={() => handleAddNew("video")}
-                  className="btn-primary"
-                >
-                  Add New Video
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {videos.map((video) => (
-                  <div key={video._id} className="card">
-                    <video
-                      src={video.video}
-                      className="w-full h-32 object-cover rounded-t-lg"
-                      controls
-                    />
-                    <div className="p-4">
-                      <h3 className="font-semibold">{video.title}</h3>
-                      <p className="text-secondary-600 text-sm">
-                        {video.description}
-                      </p>
-                      <div className="flex space-x-2 mt-3">
-                        <button
-                          onClick={() => handleEdit(video, "video")}
-                          className="btn-secondary text-xs"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete("gallery", video._id)}
-                          className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "team" && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">Team Management</h2>
-                <button
-                  onClick={() => handleAddNew("team")}
-                  className="btn-primary"
-                >
-                  Add New Team Member
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {team.map((member) => (
-                  <div key={member._id} className="card">
-                    <div className="flex items-center space-x-4 p-4">
-                      <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-xl">
-                        {member.initials}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{member.name}</h3>
-                        <p className="text-secondary-600 text-sm">
-                          {member.position}
-                        </p>
-                        <div className="flex items-center justify-between mt-2">
-                          <span
-                            className={`px-2 py-1 text-xs rounded ${
-                              member.isActive
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {member.isActive ? "Active" : "Inactive"}
-                          </span>
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handleEdit(member, "team")}
-                              className="btn-secondary text-xs"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDelete("team", member._id)}
-                              className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "credentials" && (
-            <div>
-              <h2 className="text-2xl font-semibold mb-6">
-                Admin Credentials Management
-              </h2>
-              <div className="max-w-md">
-                <div className="card">
-                  <h3 className="text-lg font-semibold mb-4">
-                    Change Password & Email
-                  </h3>
-                  <form onSubmit={handleCredentialsUpdate}>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-secondary-700 mb-2">
-                        Current Password
-                      </label>
-                      <input
-                        type="password"
-                        value={credentialsForm.currentPassword}
-                        onChange={(e) =>
-                          setCredentialsForm((prev) => ({
-                            ...prev,
-                            currentPassword: e.target.value,
-                          }))
-                        }
-                        className="input-field"
-                        required
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-secondary-700 mb-2">
-                        New Email (Optional)
-                      </label>
-                      <input
-                        type="email"
-                        value={credentialsForm.newEmail}
-                        onChange={(e) =>
-                          setCredentialsForm((prev) => ({
-                            ...prev,
-                            newEmail: e.target.value,
-                          }))
-                        }
-                        className="input-field"
-                        placeholder="Leave empty to keep current email"
-                      />
-                    </div>
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-secondary-700 mb-2">
-                        New Password (Optional)
-                      </label>
-                      <input
-                        type="password"
-                        value={credentialsForm.newPassword}
-                        onChange={(e) =>
-                          setCredentialsForm((prev) => ({
-                            ...prev,
-                            newPassword: e.target.value,
-                          }))
-                        }
-                        className="input-field"
-                        placeholder="Leave empty to keep current password"
-                        minLength={6}
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="w-full btn-primary"
-                      disabled={credentialsLoading}
-                    >
-                      {credentialsLoading
-                        ? "Updating..."
-                        : "Update Credentials"}
-                    </button>
-                  </form>
-                  {credentialsMessage && (
-                    <div
-                      className={`mt-4 px-4 py-3 rounded ${
-                        credentialsMessage.includes("success")
-                          ? "bg-green-100 border border-green-400 text-green-700"
-                          : "bg-red-100 border border-red-400 text-red-700"
-                      }`}
-                    >
-                      {credentialsMessage}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </>
       )}
     </div>
   );
