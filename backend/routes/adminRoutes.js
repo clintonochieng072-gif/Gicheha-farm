@@ -201,7 +201,9 @@ router.post(
       await admin.save();
 
       // Send reset email
-      const resetUrl = `${process.env.FRONTEND_URL}/admin/reset-password/${resetToken}`;
+      const resetUrl = `${
+        process.env.FRONTEND_URL || "https://gicheha-farm-1.onrender.com"
+      }/admin/reset-password/${resetToken}`;
 
       const mailOptions = {
         from: process.env.EMAIL_USER,
