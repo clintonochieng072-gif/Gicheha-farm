@@ -619,7 +619,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                           : "https://via.placeholder.com/100x75?text=No+Image"
                       }
                       alt={product.name}
-                      className="w-full h-16 object-cover rounded mb-2"
+                      className="w-full h-16 object-contain rounded mb-2 bg-gray-50"
                     />
                     <h4 className="font-medium text-sm truncate">
                       {product.name}
@@ -673,7 +673,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                       <img
                         src={item.image}
                         alt={item.title}
-                        className="w-full h-16 object-cover rounded mb-1"
+                        className="w-full h-16 object-contain rounded mb-1 bg-gray-50"
                       />
                       <p className="text-xs truncate">{item.title}</p>
                       <div className="flex space-x-1 mt-1">
@@ -715,7 +715,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                     <div key={video._id} className="border rounded p-2">
                       <video
                         src={video.video}
-                        className="w-full h-16 object-cover rounded mb-1"
+                        className="w-full h-16 object-contain rounded mb-1 bg-gray-50"
                       />
                       <p className="text-xs truncate">{video.title}</p>
                       <div className="flex space-x-1 mt-1">
