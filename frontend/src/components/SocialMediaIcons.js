@@ -97,9 +97,12 @@ const SocialMediaIcons = ({
     }
   };
 
+  // Ensure socialMedia is an array before processing
+  const socialMediaArray = Array.isArray(socialMedia) ? socialMedia : [];
+
   return (
     <div className={`flex flex-wrap gap-4 ${className}`}>
-      {socialMedia
+      {socialMediaArray
         .filter((social) => social.isActive)
         .map((social) => (
           <a

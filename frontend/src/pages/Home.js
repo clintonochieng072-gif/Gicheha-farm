@@ -20,6 +20,18 @@ import {
 import { useCart } from "../context/CartContext";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
+// Suppress the deprecated Marker warning
+const originalWarn = console.warn;
+console.warn = (...args) => {
+  if (
+    args[0]?.includes &&
+    args[0].includes("google.maps.Marker is deprecated")
+  ) {
+    return;
+  }
+  originalWarn(...args);
+};
+
 const Home = () => {
   const { addToCart } = useCart();
   const [featuredProducts, setFeaturedProducts] = useState([]);
