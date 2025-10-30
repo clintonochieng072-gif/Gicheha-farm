@@ -619,7 +619,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                           : "https://via.placeholder.com/100x75?text=No+Image"
                       }
                       alt={product.name}
-                      className="w-full h-16 object-contain rounded mb-2 bg-gray-50"
+                      className="w-full h-16 object-cover rounded mb-2"
                     />
                     <h4 className="font-medium text-sm truncate">
                       {product.name}
@@ -673,7 +673,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                       <img
                         src={item.image}
                         alt={item.title}
-                        className="w-full h-16 object-contain rounded mb-1 bg-gray-50"
+                        className="w-full h-16 object-cover rounded mb-1"
                       />
                       <p className="text-xs truncate">{item.title}</p>
                       <div className="flex space-x-1 mt-1">
@@ -715,7 +715,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                     <div key={video._id} className="border rounded p-2">
                       <video
                         src={video.video}
-                        className="w-full h-16 object-contain rounded mb-1 bg-gray-50"
+                        className="w-full h-16 object-cover rounded mb-1"
                       />
                       <p className="text-xs truncate">{video.title}</p>
                       <div className="flex space-x-1 mt-1">
@@ -887,7 +887,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                       <img
                         src={logo.url}
                         alt={logo.name}
-                        className="w-full h-8 object-contain"
+                        className="w-full h-8 object-cover"
                       />
                       <div className="flex space-x-1 mt-1">
                         <button
@@ -1220,7 +1220,7 @@ const AdminDashboard = ({ token, onLogout }) => {
       {/* Add/Edit Form */}
       {showAddForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-96 overflow-y-auto">
+          <div className="bg-white p-6 rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-semibold mb-4">
               {editingItem
                 ? `Edit ${currentFormType.slice(0, -1)}`
