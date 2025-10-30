@@ -1394,6 +1394,26 @@ const AdminDashboard = ({ token, onLogout }) => {
                         </option>
                       ))}
                   </select>
+                  {/* Display existing images when editing */}
+                  {editingItem &&
+                    editingItem.images &&
+                    editingItem.images.length > 0 && (
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-secondary-700 mb-2">
+                          Current Images
+                        </label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {editingItem.images.map((image, index) => (
+                            <img
+                              key={index}
+                              src={image}
+                              alt={`Current ${index + 1}`}
+                              className="w-full h-20 object-cover rounded border"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   <input
                     type="file"
                     name="images"
@@ -1503,6 +1523,27 @@ const AdminDashboard = ({ token, onLogout }) => {
                     className="w-full p-2 border rounded"
                     rows="2"
                   />
+                  {/* Display existing image/video when editing */}
+                  {editingItem && editingItem.image && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-secondary-700 mb-2">
+                        Current Media
+                      </label>
+                      {editingItem.type === "video" ? (
+                        <video
+                          src={editingItem.video || editingItem.image}
+                          className="w-full h-32 object-cover rounded border"
+                          controls
+                        />
+                      ) : (
+                        <img
+                          src={editingItem.image}
+                          alt="Current"
+                          className="w-full h-32 object-cover rounded border"
+                        />
+                      )}
+                    </div>
+                  )}
                   <input
                     type="file"
                     name="image"
@@ -1546,6 +1587,19 @@ const AdminDashboard = ({ token, onLogout }) => {
                     className="w-full p-2 border rounded"
                     rows="2"
                   />
+                  {/* Display existing video when editing */}
+                  {editingItem && editingItem.video && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-secondary-700 mb-2">
+                        Current Video
+                      </label>
+                      <video
+                        src={editingItem.video}
+                        className="w-full h-32 object-cover rounded border"
+                        controls
+                      />
+                    </div>
+                  )}
                   <input
                     type="file"
                     name="image"

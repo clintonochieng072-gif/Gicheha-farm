@@ -17,7 +17,15 @@ const Gallery = () => {
 
   const fetchGallery = async () => {
     try {
-      const response = await axios.get("/api/gallery");
+      const response = await axios.get("/api/gallery", {
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+        params: {
+          _t: Date.now(), // Cache busting parameter
+        },
+      });
       setGallery(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error fetching gallery:", error);

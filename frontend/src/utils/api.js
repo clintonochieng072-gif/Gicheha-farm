@@ -5,6 +5,11 @@ const api = axios.create({
   baseURL:
     process.env.REACT_APP_API_URL || "https://gicheha-farm.onrender.com/api",
   withCredentials: true, // Important for cookies
+  headers: {
+    "Cache-Control": "no-cache",
+    Pragma: "no-cache",
+    Expires: "0",
+  },
 });
 
 // Request interceptor to add access token

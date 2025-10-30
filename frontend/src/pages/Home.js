@@ -59,13 +59,34 @@ const Home = () => {
         socialMediaRes,
         teamRes,
       ] = await Promise.all([
-        axios.get("/api/products"),
-        axios.get("/api/testimonials"),
-        axios.get("/api/features"),
-        axios.get("/api/about"),
-        axios.get("/api/gallery"),
-        axios.get("/api/social-media"),
-        axios.get("/api/team"),
+        axios.get("/api/products", {
+          headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+          params: { _t: Date.now() },
+        }),
+        axios.get("/api/testimonials", {
+          headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+          params: { _t: Date.now() },
+        }),
+        axios.get("/api/features", {
+          headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+          params: { _t: Date.now() },
+        }),
+        axios.get("/api/about", {
+          headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+          params: { _t: Date.now() },
+        }),
+        axios.get("/api/gallery", {
+          headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+          params: { _t: Date.now() },
+        }),
+        axios.get("/api/social-media", {
+          headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+          params: { _t: Date.now() },
+        }),
+        axios.get("/api/team", {
+          headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+          params: { _t: Date.now() },
+        }),
       ]);
 
       // Ensure data is an array before processing
