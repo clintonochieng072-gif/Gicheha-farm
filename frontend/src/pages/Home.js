@@ -18,7 +18,7 @@ import {
   FaCarrot,
 } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
-import { Map, GoogleApiWrapper, Marker } from "google-maps-react";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 const Home = () => {
   const { addToCart } = useCart();
@@ -487,23 +487,29 @@ const Home = () => {
               </div>
             </div>
             <div className="h-96 rounded-lg overflow-hidden shadow-lg">
-              <Map
-                google={window.google}
-                zoom={14}
-                style={{ width: "100%", height: "100%" }}
-                initialCenter={{
-                  lat: -1.3958, // Approximate coordinates for Rongai, Kenya
-                  lng: 36.7439,
-                }}
+              <LoadScript
+                googleMapsApiKey={
+                  process.env.REACT_APP_GOOGLE_MAPS_API_KEY ||
+                  "YOUR_GOOGLE_MAPS_API_KEY"
+                }
               >
-                <Marker
-                  position={{
-                    lat: -1.3958,
+                <GoogleMap
+                  mapContainerStyle={{ width: "100%", height: "100%" }}
+                  center={{
+                    lat: -1.3958, // Approximate coordinates for Rongai, Kenya
                     lng: 36.7439,
                   }}
-                  title="Gicheha Farm Rongai"
-                />
-              </Map>
+                  zoom={14}
+                >
+                  <Marker
+                    position={{
+                      lat: -1.3958,
+                      lng: 36.7439,
+                    }}
+                    title="Gicheha Farm Rongai"
+                  />
+                </GoogleMap>
+              </LoadScript>
             </div>
           </div>
         </div>
@@ -614,9 +620,4 @@ const Home = () => {
   );
 };
 
-const HomeWithGoogleMaps = GoogleApiWrapper({
-  apiKey:
-    process.env.REACT_APP_GOOGLE_MAPS_API_KEY || "YOUR_GOOGLE_MAPS_API_KEY",
-})(Home);
-
-export default HomeWithGoogleMaps;
+export default Home;
