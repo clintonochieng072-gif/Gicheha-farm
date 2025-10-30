@@ -27,6 +27,17 @@ const AdminDashboard = ({ token, onLogout }) => {
   });
   const [credentialsLoading, setCredentialsLoading] = useState(false);
   const [credentialsMessage, setCredentialsMessage] = useState("");
+  const [expandedProducts, setExpandedProducts] = useState(false);
+  const [expandedGallery, setExpandedGallery] = useState(false);
+  const [expandedVideos, setExpandedVideos] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState(false);
+  const [expandedUnits, setExpandedUnits] = useState(false);
+  const [expandedSocialMedia, setExpandedSocialMedia] = useState(false);
+  const [expandedLogos, setExpandedLogos] = useState(false);
+  const [expandedTestimonials, setExpandedTestimonials] = useState(false);
+  const [expandedFeatures, setExpandedFeatures] = useState(false);
+  const [expandedAbouts, setExpandedAbouts] = useState(false);
+  const [expandedTeam, setExpandedTeam] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -610,44 +621,54 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {products.slice(0, 4).map((product) => (
-                  <div key={product._id} className="border rounded p-3">
-                    <img
-                      src={
-                        product.images && product.images.length > 0
-                          ? product.images[0]
-                          : "https://via.placeholder.com/100x75?text=No+Image"
-                      }
-                      alt={product.name}
-                      className="w-full h-16 object-cover rounded mb-2"
-                    />
-                    <h4 className="font-medium text-sm truncate">
-                      {product.name}
-                    </h4>
-                    <p className="text-secondary-600 text-xs">
-                      KSh {product.price}
-                    </p>
-                    <div className="flex space-x-1 mt-2">
-                      <button
-                        onClick={() => handleEdit(product, "product")}
-                        className="text-xs text-primary-600 hover:text-primary-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete("product", product._id)}
-                        className="text-xs text-red-600 hover:text-red-800"
-                      >
-                        Delete
-                      </button>
+                {(expandedProducts ? products : products.slice(0, 4)).map(
+                  (product) => (
+                    <div
+                      key={product._id}
+                      className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <img
+                        src={
+                          product.images && product.images.length > 0
+                            ? product.images[0]
+                            : "https://via.placeholder.com/100x75?text=No+Image"
+                        }
+                        alt={product.name}
+                        className="w-full h-20 object-cover rounded-lg mb-3"
+                      />
+                      <h4 className="font-semibold text-base md:text-lg truncate mb-1">
+                        {product.name}
+                      </h4>
+                      <p className="text-secondary-600 text-sm md:text-base mb-3">
+                        KSh {product.price}
+                      </p>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleEdit(product, "product")}
+                          className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete("product", product._id)}
+                          className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
               {products.length > 4 && (
-                <p className="text-sm text-secondary-500 mt-2">
-                  And {products.length - 4} more...
-                </p>
+                <button
+                  onClick={() => setExpandedProducts(!expandedProducts)}
+                  className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
+                >
+                  {expandedProducts
+                    ? "Show Less"
+                    : `Show ${products.length - 4} More...`}
+                </button>
               )}
             </div>
           </div>
@@ -667,36 +688,48 @@ const AdminDashboard = ({ token, onLogout }) => {
                     Add Image
                   </button>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {gallery.slice(0, 6).map((item) => (
-                    <div key={item._id} className="border rounded p-2">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-full h-16 object-cover rounded mb-1"
-                      />
-                      <p className="text-xs truncate">{item.title}</p>
-                      <div className="flex space-x-1 mt-1">
-                        <button
-                          onClick={() => handleEdit(item, "gallery")}
-                          className="text-xs text-primary-600 hover:text-primary-800"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete("gallery", item._id)}
-                          className="text-xs text-red-600 hover:text-red-800"
-                        >
-                          Del
-                        </button>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {(expandedGallery ? gallery : gallery.slice(0, 6)).map(
+                    (item) => (
+                      <div
+                        key={item._id}
+                        className="border rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-full h-20 object-cover rounded-lg mb-2"
+                        />
+                        <p className="text-sm md:text-base truncate font-medium mb-2">
+                          {item.title}
+                        </p>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleEdit(item, "gallery")}
+                            className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-2 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete("gallery", item._id)}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-2 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors"
+                          >
+                            Del
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
                 {gallery.length > 6 && (
-                  <p className="text-sm text-secondary-500 mt-2">
-                    And {gallery.length - 6} more...
-                  </p>
+                  <button
+                    onClick={() => setExpandedGallery(!expandedGallery)}
+                    className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
+                  >
+                    {expandedGallery
+                      ? "Show Less"
+                      : `Show ${gallery.length - 6} More...`}
+                  </button>
                 )}
               </div>
 
@@ -710,35 +743,47 @@ const AdminDashboard = ({ token, onLogout }) => {
                     Add Video
                   </button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {videos.slice(0, 4).map((video) => (
-                    <div key={video._id} className="border rounded p-2">
-                      <video
-                        src={video.video}
-                        className="w-full h-16 object-cover rounded mb-1"
-                      />
-                      <p className="text-xs truncate">{video.title}</p>
-                      <div className="flex space-x-1 mt-1">
-                        <button
-                          onClick={() => handleEdit(video, "video")}
-                          className="text-xs text-primary-600 hover:text-primary-800"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete("gallery", video._id)}
-                          className="text-xs text-red-600 hover:text-red-800"
-                        >
-                          Del
-                        </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {(expandedVideos ? videos : videos.slice(0, 4)).map(
+                    (video) => (
+                      <div
+                        key={video._id}
+                        className="border rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        <video
+                          src={video.video}
+                          className="w-full h-20 object-cover rounded-lg mb-2"
+                        />
+                        <p className="text-sm md:text-base truncate font-medium mb-2">
+                          {video.title}
+                        </p>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleEdit(video, "video")}
+                            className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-2 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete("gallery", video._id)}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-2 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors"
+                          >
+                            Del
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
                 {videos.length > 4 && (
-                  <p className="text-sm text-secondary-500 mt-2">
-                    And {videos.length - 4} more...
-                  </p>
+                  <button
+                    onClick={() => setExpandedVideos(!expandedVideos)}
+                    className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
+                  >
+                    {expandedVideos
+                      ? "Show Less"
+                      : `Show ${videos.length - 4} More...`}
+                  </button>
                 )}
               </div>
             </div>
@@ -754,23 +799,28 @@ const AdminDashboard = ({ token, onLogout }) => {
                     Add
                   </button>
                 </div>
-                <div className="space-y-2">
-                  {categories.slice(0, 3).map((category) => (
+                <div className="space-y-3">
+                  {(expandedCategories
+                    ? categories
+                    : categories.slice(0, 3)
+                  ).map((category) => (
                     <div
                       key={category._id}
-                      className="flex justify-between items-center"
+                      className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <span className="text-sm">{category.name}</span>
-                      <div className="flex space-x-1">
+                      <span className="text-sm md:text-base font-medium">
+                        {category.name}
+                      </span>
+                      <div className="flex space-x-2">
                         <button
                           onClick={() => handleEdit(category, "category")}
-                          className="text-xs text-primary-600 hover:text-primary-800"
+                          className="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete("category", category._id)}
-                          className="text-xs text-red-600 hover:text-red-800"
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors"
                         >
                           Del
                         </button>
@@ -779,9 +829,14 @@ const AdminDashboard = ({ token, onLogout }) => {
                   ))}
                 </div>
                 {categories.length > 3 && (
-                  <p className="text-xs text-secondary-500 mt-2">
-                    And {categories.length - 3} more...
-                  </p>
+                  <button
+                    onClick={() => setExpandedCategories(!expandedCategories)}
+                    className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
+                  >
+                    {expandedCategories
+                      ? "Show Less"
+                      : `Show ${categories.length - 3} More...`}
+                  </button>
                 )}
               </div>
 
@@ -795,23 +850,25 @@ const AdminDashboard = ({ token, onLogout }) => {
                     Add
                   </button>
                 </div>
-                <div className="space-y-2">
-                  {units.slice(0, 3).map((unit) => (
+                <div className="space-y-3">
+                  {(expandedUnits ? units : units.slice(0, 3)).map((unit) => (
                     <div
                       key={unit._id}
-                      className="flex justify-between items-center"
+                      className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <span className="text-sm">{unit.name}</span>
-                      <div className="flex space-x-1">
+                      <span className="text-sm md:text-base font-medium">
+                        {unit.name}
+                      </span>
+                      <div className="flex space-x-2">
                         <button
                           onClick={() => handleEdit(unit, "unit")}
-                          className="text-xs text-primary-600 hover:text-primary-800"
+                          className="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete("unit", unit._id)}
-                          className="text-xs text-red-600 hover:text-red-800"
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors"
                         >
                           Del
                         </button>
@@ -820,9 +877,14 @@ const AdminDashboard = ({ token, onLogout }) => {
                   ))}
                 </div>
                 {units.length > 3 && (
-                  <p className="text-xs text-secondary-500 mt-2">
-                    And {units.length - 3} more...
-                  </p>
+                  <button
+                    onClick={() => setExpandedUnits(!expandedUnits)}
+                    className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
+                  >
+                    {expandedUnits
+                      ? "Show Less"
+                      : `Show ${units.length - 3} More...`}
+                  </button>
                 )}
               </div>
 
@@ -836,19 +898,22 @@ const AdminDashboard = ({ token, onLogout }) => {
                     Add
                   </button>
                 </div>
-                <div className="space-y-2">
-                  {socialMedia.slice(0, 3).map((social) => (
+                <div className="space-y-3">
+                  {(expandedSocialMedia
+                    ? socialMedia
+                    : socialMedia.slice(0, 3)
+                  ).map((social) => (
                     <div
                       key={social._id}
-                      className="flex justify-between items-center"
+                      className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <span className="text-sm capitalize">
+                      <span className="text-sm md:text-base font-medium capitalize">
                         {social.platform}
                       </span>
-                      <div className="flex space-x-1">
+                      <div className="flex space-x-2">
                         <button
                           onClick={() => handleEdit(social, "social-media")}
-                          className="text-xs text-primary-600 hover:text-primary-800"
+                          className="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors"
                         >
                           Edit
                         </button>
@@ -856,7 +921,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                           onClick={() =>
                             handleDelete("social-media", social._id)
                           }
-                          className="text-xs text-red-600 hover:text-red-800"
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors"
                         >
                           Del
                         </button>
@@ -865,9 +930,14 @@ const AdminDashboard = ({ token, onLogout }) => {
                   ))}
                 </div>
                 {socialMedia.length > 3 && (
-                  <p className="text-xs text-secondary-500 mt-2">
-                    And {socialMedia.length - 3} more...
-                  </p>
+                  <button
+                    onClick={() => setExpandedSocialMedia(!expandedSocialMedia)}
+                    className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
+                  >
+                    {expandedSocialMedia
+                      ? "Show Less"
+                      : `Show ${socialMedia.length - 3} More...`}
+                  </button>
                 )}
               </div>
 
@@ -881,24 +951,27 @@ const AdminDashboard = ({ token, onLogout }) => {
                     Add
                   </button>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {logos.slice(0, 4).map((logo) => (
-                    <div key={logo._id} className="border rounded p-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {(expandedLogos ? logos : logos.slice(0, 4)).map((logo) => (
+                    <div
+                      key={logo._id}
+                      className="border rounded-lg p-3 bg-white shadow-sm hover:shadow-md transition-shadow"
+                    >
                       <img
                         src={logo.url}
                         alt={logo.name}
-                        className="w-full h-8 object-cover"
+                        className="w-full h-12 object-cover rounded-lg mb-2"
                       />
-                      <div className="flex space-x-1 mt-1">
+                      <div className="flex space-x-2">
                         <button
                           onClick={() => handleEdit(logo, "logo")}
-                          className="text-xs text-primary-600 hover:text-primary-800"
+                          className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-2 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete("logo", logo._id)}
-                          className="text-xs text-red-600 hover:text-red-800"
+                          className="flex-1 bg-red-600 hover:bg-red-700 text-white px-2 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors"
                         >
                           Del
                         </button>
@@ -907,9 +980,14 @@ const AdminDashboard = ({ token, onLogout }) => {
                   ))}
                 </div>
                 {logos.length > 4 && (
-                  <p className="text-xs text-secondary-500 mt-2">
-                    And {logos.length - 4} more...
-                  </p>
+                  <button
+                    onClick={() => setExpandedLogos(!expandedLogos)}
+                    className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
+                  >
+                    {expandedLogos
+                      ? "Show Less"
+                      : `Show ${logos.length - 4} More...`}
+                  </button>
                 )}
               </div>
             </div>
@@ -929,15 +1007,21 @@ const AdminDashboard = ({ token, onLogout }) => {
                   Add Testimonial
                 </button>
               </div>
-              <div className="space-y-3">
-                {testimonials.slice(0, 3).map((testimonial) => (
-                  <div key={testimonial._id} className="border rounded p-3">
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="font-medium text-sm">
+              <div className="space-y-4">
+                {(expandedTestimonials
+                  ? testimonials
+                  : testimonials.slice(0, 3)
+                ).map((testimonial) => (
+                  <div
+                    key={testimonial._id}
+                    className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <span className="font-semibold text-base md:text-lg">
                         {testimonial.name}
                       </span>
                       <span
-                        className={`px-2 py-1 text-xs rounded ${
+                        className={`px-3 py-1 text-xs md:text-sm rounded-lg font-medium ${
                           testimonial.isApproved
                             ? "bg-green-100 text-green-800"
                             : "bg-yellow-100 text-yellow-800"
@@ -946,23 +1030,23 @@ const AdminDashboard = ({ token, onLogout }) => {
                         {testimonial.isApproved ? "Approved" : "Pending"}
                       </span>
                     </div>
-                    <p className="text-secondary-600 text-xs line-clamp-2">
+                    <p className="text-secondary-600 text-sm md:text-base line-clamp-2 mb-3">
                       {testimonial.message}
                     </p>
-                    <div className="flex space-x-1 mt-2">
+                    <div className="flex space-x-2">
                       {!testimonial.isApproved && (
                         <button
                           onClick={() =>
                             handleApproveTestimonial(testimonial._id)
                           }
-                          className="text-xs text-green-600 hover:text-green-800"
+                          className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
                         >
                           Approve
                         </button>
                       )}
                       <button
                         onClick={() => handleEdit(testimonial, "testimonial")}
-                        className="text-xs text-primary-600 hover:text-primary-800"
+                        className="bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
                       >
                         Edit
                       </button>
@@ -970,7 +1054,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                         onClick={() =>
                           handleDelete("testimonial", testimonial._id)
                         }
-                        className="text-xs text-red-600 hover:text-red-800"
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
                       >
                         Delete
                       </button>
@@ -979,9 +1063,14 @@ const AdminDashboard = ({ token, onLogout }) => {
                 ))}
               </div>
               {testimonials.length > 3 && (
-                <p className="text-sm text-secondary-500 mt-2">
-                  And {testimonials.length - 3} more...
-                </p>
+                <button
+                  onClick={() => setExpandedTestimonials(!expandedTestimonials)}
+                  className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
+                >
+                  {expandedTestimonials
+                    ? "Show Less"
+                    : `Show ${testimonials.length - 3} More...`}
+                </button>
               )}
             </div>
 
@@ -996,34 +1085,46 @@ const AdminDashboard = ({ token, onLogout }) => {
                     Add Feature
                   </button>
                 </div>
-                <div className="space-y-3">
-                  {features.slice(0, 3).map((feature) => (
-                    <div key={feature._id} className="border rounded p-3">
-                      <h4 className="font-medium text-sm">{feature.title}</h4>
-                      <p className="text-secondary-600 text-xs line-clamp-2">
-                        {feature.description}
-                      </p>
-                      <div className="flex space-x-1 mt-2">
-                        <button
-                          onClick={() => handleEdit(feature, "feature")}
-                          className="text-xs text-primary-600 hover:text-primary-800"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete("feature", feature._id)}
-                          className="text-xs text-red-600 hover:text-red-800"
-                        >
-                          Delete
-                        </button>
+                <div className="space-y-4">
+                  {(expandedFeatures ? features : features.slice(0, 3)).map(
+                    (feature) => (
+                      <div
+                        key={feature._id}
+                        className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        <h4 className="font-semibold text-base md:text-lg mb-2">
+                          {feature.title}
+                        </h4>
+                        <p className="text-secondary-600 text-sm md:text-base line-clamp-2 mb-3">
+                          {feature.description}
+                        </p>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleEdit(feature, "feature")}
+                            className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete("feature", feature._id)}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
                 {features.length > 3 && (
-                  <p className="text-sm text-secondary-500 mt-2">
-                    And {features.length - 3} more...
-                  </p>
+                  <button
+                    onClick={() => setExpandedFeatures(!expandedFeatures)}
+                    className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
+                  >
+                    {expandedFeatures
+                      ? "Show Less"
+                      : `Show ${features.length - 3} More...`}
+                  </button>
                 )}
               </div>
 
@@ -1037,48 +1138,60 @@ const AdminDashboard = ({ token, onLogout }) => {
                     Add Content
                   </button>
                 </div>
-                <div className="space-y-3">
-                  {abouts.slice(0, 3).map((about) => (
-                    <div key={about._id} className="border rounded p-3">
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="font-medium text-sm capitalize">
-                          {about.section}
-                        </span>
-                        <span
-                          className={`px-2 py-1 text-xs rounded ${
-                            about.isActive
-                              ? "bg-green-100 text-green-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
-                          {about.isActive ? "Active" : "Inactive"}
-                        </span>
+                <div className="space-y-4">
+                  {(expandedAbouts ? abouts : abouts.slice(0, 3)).map(
+                    (about) => (
+                      <div
+                        key={about._id}
+                        className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <span className="font-semibold text-base md:text-lg capitalize">
+                            {about.section}
+                          </span>
+                          <span
+                            className={`px-3 py-1 text-xs md:text-sm rounded-lg font-medium ${
+                              about.isActive
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {about.isActive ? "Active" : "Inactive"}
+                          </span>
+                        </div>
+                        <h4 className="font-semibold text-base md:text-lg mb-2">
+                          {about.title}
+                        </h4>
+                        <p className="text-secondary-600 text-sm md:text-base line-clamp-2 mb-3">
+                          {about.content}
+                        </p>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleEdit(about, "about")}
+                            className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete("about", about._id)}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                      <h4 className="font-medium text-sm">{about.title}</h4>
-                      <p className="text-secondary-600 text-xs line-clamp-2">
-                        {about.content}
-                      </p>
-                      <div className="flex space-x-1 mt-2">
-                        <button
-                          onClick={() => handleEdit(about, "about")}
-                          className="text-xs text-primary-600 hover:text-primary-800"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete("about", about._id)}
-                          className="text-xs text-red-600 hover:text-red-800"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
                 {abouts.length > 3 && (
-                  <p className="text-sm text-secondary-500 mt-2">
-                    And {abouts.length - 3} more...
-                  </p>
+                  <button
+                    onClick={() => setExpandedAbouts(!expandedAbouts)}
+                    className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
+                  >
+                    {expandedAbouts
+                      ? "Show Less"
+                      : `Show ${abouts.length - 3} More...`}
+                  </button>
                 )}
               </div>
 
@@ -1092,30 +1205,35 @@ const AdminDashboard = ({ token, onLogout }) => {
                     Add Member
                   </button>
                 </div>
-                <div className="space-y-3">
-                  {team.slice(0, 3).map((member) => (
-                    <div key={member._id} className="border rounded p-3">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-sm">
+                <div className="space-y-4">
+                  {(expandedTeam ? team : team.slice(0, 3)).map((member) => (
+                    <div
+                      key={member._id}
+                      className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-center space-x-4 mb-3">
+                        <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-base md:text-lg">
                           {member.initials}
                         </div>
                         <div>
-                          <h4 className="font-medium text-sm">{member.name}</h4>
-                          <p className="text-secondary-600 text-xs">
+                          <h4 className="font-semibold text-base md:text-lg">
+                            {member.name}
+                          </h4>
+                          <p className="text-secondary-600 text-sm md:text-base">
                             {member.position}
                           </p>
                         </div>
                       </div>
-                      <div className="flex space-x-1">
+                      <div className="flex space-x-2">
                         <button
                           onClick={() => handleEdit(member, "team")}
-                          className="text-xs text-primary-600 hover:text-primary-800"
+                          className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete("team", member._id)}
-                          className="text-xs text-red-600 hover:text-red-800"
+                          className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
                         >
                           Delete
                         </button>
@@ -1124,9 +1242,14 @@ const AdminDashboard = ({ token, onLogout }) => {
                   ))}
                 </div>
                 {team.length > 3 && (
-                  <p className="text-sm text-secondary-500 mt-2">
-                    And {team.length - 3} more...
-                  </p>
+                  <button
+                    onClick={() => setExpandedTeam(!expandedTeam)}
+                    className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
+                  >
+                    {expandedTeam
+                      ? "Show Less"
+                      : `Show ${team.length - 3} More...`}
+                  </button>
                 )}
               </div>
             </div>
