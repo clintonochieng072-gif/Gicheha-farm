@@ -3,6 +3,7 @@ import api from "../utils/api";
 
 const AdminDashboard = ({ token, onLogout }) => {
   const [activeTab, setActiveTab] = useState("products");
+  const [activeSection, setActiveSection] = useState("products");
   const [products, setProducts] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const [gallery, setGallery] = useState([]);
@@ -503,18 +504,10 @@ const AdminDashboard = ({ token, onLogout }) => {
   };
 
   const sections = [
-    { id: "products", name: "Products", type: "management" },
-    { id: "testimonials", name: "Testimonials", type: "management" },
-    { id: "gallery", name: "Gallery", type: "media" },
-    { id: "videos", name: "Videos", type: "media" },
-    { id: "categories", name: "Categories", type: "config" },
-    { id: "units", name: "Units", type: "config" },
-    { id: "social-media", name: "Social Media", type: "config" },
-    { id: "logos", name: "Logos", type: "config" },
-    { id: "why-choose-us", name: "Why Choose Us", type: "content" },
-    { id: "about", name: "About", type: "content" },
-    { id: "team", name: "Team", type: "content" },
-    { id: "credentials", name: "Credentials", type: "admin" },
+    { id: "products", name: "Products" },
+    { id: "media-config", name: "Media Configurations" },
+    { id: "testimonial-content", name: "Testimonial Content About" },
+    { id: "admin", name: "Admin" },
   ];
 
   const handleLogout = async () => {
@@ -584,13 +577,27 @@ const AdminDashboard = ({ token, onLogout }) => {
         </div>
       </div>
 
-      {/* Section Headers */}
+      {/* Horizontal Section Tabs */}
+      <div className="flex space-x-4 mb-8 border-b border-secondary-200 pb-4">
+        {sections.map((section) => (
+          <button
+            key={section.id}
+            onClick={() => setActiveSection(section.id)}
+            className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+              activeSection === section.id
+                ? "bg-primary-600 text-white"
+                : "bg-secondary-100 text-secondary-700 hover:bg-secondary-200"
+            }`}
+          >
+            {section.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Section Content */}
       <div className="space-y-8">
-        {/* Management Section */}
-        <div>
-          <h2 className="text-2xl font-semibold text-secondary-800 mb-4">
-            Management
-          </h2>
+        {/* Products Section */}
+        {activeSection === "products" && (
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
               <div className="flex justify-between items-center mb-4">
@@ -643,7 +650,275 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </p>
               )}
             </div>
+          </div>
+        )}
 
+        {/* Media Configurations Section */}
+        {activeSection === "media-config" && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium">Gallery</h3>
+                  <button
+                    onClick={() => handleAddNew("gallery")}
+                    className="btn-primary text-sm"
+                  >
+                    Add Image
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {gallery.slice(0, 6).map((item) => (
+                    <div key={item._id} className="border rounded p-2">
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-full h-16 object-cover rounded mb-1"
+                      />
+                      <p className="text-xs truncate">{item.title}</p>
+                      <div className="flex space-x-1 mt-1">
+                        <button
+                          onClick={() => handleEdit(item, "gallery")}
+                          className="text-xs text-primary-600 hover:text-primary-800"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete("gallery", item._id)}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Del
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {gallery.length > 6 && (
+                  <p className="text-sm text-secondary-500 mt-2">
+                    And {gallery.length - 6} more...
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium">Videos</h3>
+                  <button
+                    onClick={() => handleAddNew("videos")}
+                    className="btn-primary text-sm"
+                  >
+                    Add Video
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {videos.slice(0, 4).map((video) => (
+                    <div key={video._id} className="border rounded p-2">
+                      <video
+                        src={video.video}
+                        className="w-full h-16 object-cover rounded mb-1"
+                      />
+                      <p className="text-xs truncate">{video.title}</p>
+                      <div className="flex space-x-1 mt-1">
+                        <button
+                          onClick={() => handleEdit(video, "video")}
+                          className="text-xs text-primary-600 hover:text-primary-800"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete("gallery", video._id)}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Del
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {videos.length > 4 && (
+                  <p className="text-sm text-secondary-500 mt-2">
+                    And {videos.length - 4} more...
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-md font-medium">Categories</h3>
+                  <button
+                    onClick={() => handleAddNew("categories")}
+                    className="btn-primary text-xs"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {categories.slice(0, 3).map((category) => (
+                    <div
+                      key={category._id}
+                      className="flex justify-between items-center"
+                    >
+                      <span className="text-sm">{category.name}</span>
+                      <div className="flex space-x-1">
+                        <button
+                          onClick={() => handleEdit(category, "category")}
+                          className="text-xs text-primary-600 hover:text-primary-800"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete("category", category._id)}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Del
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {categories.length > 3 && (
+                  <p className="text-xs text-secondary-500 mt-2">
+                    And {categories.length - 3} more...
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-md font-medium">Units</h3>
+                  <button
+                    onClick={() => handleAddNew("units")}
+                    className="btn-primary text-xs"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {units.slice(0, 3).map((unit) => (
+                    <div
+                      key={unit._id}
+                      className="flex justify-between items-center"
+                    >
+                      <span className="text-sm">{unit.name}</span>
+                      <div className="flex space-x-1">
+                        <button
+                          onClick={() => handleEdit(unit, "unit")}
+                          className="text-xs text-primary-600 hover:text-primary-800"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete("unit", unit._id)}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Del
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {units.length > 3 && (
+                  <p className="text-xs text-secondary-500 mt-2">
+                    And {units.length - 3} more...
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-md font-medium">Social Media</h3>
+                  <button
+                    onClick={() => handleAddNew("social-media")}
+                    className="btn-primary text-xs"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {socialMedia.slice(0, 3).map((social) => (
+                    <div
+                      key={social._id}
+                      className="flex justify-between items-center"
+                    >
+                      <span className="text-sm capitalize">
+                        {social.platform}
+                      </span>
+                      <div className="flex space-x-1">
+                        <button
+                          onClick={() => handleEdit(social, "social-media")}
+                          className="text-xs text-primary-600 hover:text-primary-800"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleDelete("social-media", social._id)
+                          }
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Del
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {socialMedia.length > 3 && (
+                  <p className="text-xs text-secondary-500 mt-2">
+                    And {socialMedia.length - 3} more...
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-md font-medium">Logos</h3>
+                  <button
+                    onClick={() => handleAddNew("logos")}
+                    className="btn-primary text-xs"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {logos.slice(0, 4).map((logo) => (
+                    <div key={logo._id} className="border rounded p-1">
+                      <img
+                        src={logo.url}
+                        alt={logo.name}
+                        className="w-full h-8 object-contain"
+                      />
+                      <div className="flex space-x-1 mt-1">
+                        <button
+                          onClick={() => handleEdit(logo, "logo")}
+                          className="text-xs text-primary-600 hover:text-primary-800"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete("logo", logo._id)}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Del
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {logos.length > 4 && (
+                  <p className="text-xs text-secondary-500 mt-2">
+                    And {logos.length - 4} more...
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Testimonial Content About Section */}
+        {activeSection === "testimonial-content" && (
+          <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-medium">Testimonials</h3>
@@ -709,434 +984,157 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </p>
               )}
             </div>
-          </div>
-        </div>
 
-        {/* Media Section */}
-        <div>
-          <h2 className="text-2xl font-semibold text-secondary-800 mb-4">
-            Media
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">Gallery</h3>
-                <button
-                  onClick={() => handleAddNew("gallery")}
-                  className="btn-primary text-sm"
-                >
-                  Add Image
-                </button>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {gallery.slice(0, 6).map((item) => (
-                  <div key={item._id} className="border rounded p-2">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-full h-16 object-cover rounded mb-1"
-                    />
-                    <p className="text-xs truncate">{item.title}</p>
-                    <div className="flex space-x-1 mt-1">
-                      <button
-                        onClick={() => handleEdit(item, "gallery")}
-                        className="text-xs text-primary-600 hover:text-primary-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete("gallery", item._id)}
-                        className="text-xs text-red-600 hover:text-red-800"
-                      >
-                        Del
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {gallery.length > 6 && (
-                <p className="text-sm text-secondary-500 mt-2">
-                  And {gallery.length - 6} more...
-                </p>
-              )}
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">Videos</h3>
-                <button
-                  onClick={() => handleAddNew("videos")}
-                  className="btn-primary text-sm"
-                >
-                  Add Video
-                </button>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {videos.slice(0, 4).map((video) => (
-                  <div key={video._id} className="border rounded p-2">
-                    <video
-                      src={video.video}
-                      className="w-full h-16 object-cover rounded mb-1"
-                    />
-                    <p className="text-xs truncate">{video.title}</p>
-                    <div className="flex space-x-1 mt-1">
-                      <button
-                        onClick={() => handleEdit(video, "video")}
-                        className="text-xs text-primary-600 hover:text-primary-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete("gallery", video._id)}
-                        className="text-xs text-red-600 hover:text-red-800"
-                      >
-                        Del
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {videos.length > 4 && (
-                <p className="text-sm text-secondary-500 mt-2">
-                  And {videos.length - 4} more...
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Configuration Section */}
-        <div>
-          <h2 className="text-2xl font-semibold text-secondary-800 mb-4">
-            Configuration
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-md font-medium">Categories</h3>
-                <button
-                  onClick={() => handleAddNew("categories")}
-                  className="btn-primary text-xs"
-                >
-                  Add
-                </button>
-              </div>
-              <div className="space-y-2">
-                {categories.slice(0, 3).map((category) => (
-                  <div
-                    key={category._id}
-                    className="flex justify-between items-center"
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium">Why Choose Us</h3>
+                  <button
+                    onClick={() => handleAddNew("why-choose-us")}
+                    className="btn-primary text-sm"
                   >
-                    <span className="text-sm">{category.name}</span>
-                    <div className="flex space-x-1">
-                      <button
-                        onClick={() => handleEdit(category, "category")}
-                        className="text-xs text-primary-600 hover:text-primary-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete("category", category._id)}
-                        className="text-xs text-red-600 hover:text-red-800"
-                      >
-                        Del
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {categories.length > 3 && (
-                <p className="text-xs text-secondary-500 mt-2">
-                  And {categories.length - 3} more...
-                </p>
-              )}
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-md font-medium">Units</h3>
-                <button
-                  onClick={() => handleAddNew("units")}
-                  className="btn-primary text-xs"
-                >
-                  Add
-                </button>
-              </div>
-              <div className="space-y-2">
-                {units.slice(0, 3).map((unit) => (
-                  <div
-                    key={unit._id}
-                    className="flex justify-between items-center"
-                  >
-                    <span className="text-sm">{unit.name}</span>
-                    <div className="flex space-x-1">
-                      <button
-                        onClick={() => handleEdit(unit, "unit")}
-                        className="text-xs text-primary-600 hover:text-primary-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete("unit", unit._id)}
-                        className="text-xs text-red-600 hover:text-red-800"
-                      >
-                        Del
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {units.length > 3 && (
-                <p className="text-xs text-secondary-500 mt-2">
-                  And {units.length - 3} more...
-                </p>
-              )}
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-md font-medium">Social Media</h3>
-                <button
-                  onClick={() => handleAddNew("social-media")}
-                  className="btn-primary text-xs"
-                >
-                  Add
-                </button>
-              </div>
-              <div className="space-y-2">
-                {socialMedia.slice(0, 3).map((social) => (
-                  <div
-                    key={social._id}
-                    className="flex justify-between items-center"
-                  >
-                    <span className="text-sm capitalize">
-                      {social.platform}
-                    </span>
-                    <div className="flex space-x-1">
-                      <button
-                        onClick={() => handleEdit(social, "social-media")}
-                        className="text-xs text-primary-600 hover:text-primary-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete("social-media", social._id)}
-                        className="text-xs text-red-600 hover:text-red-800"
-                      >
-                        Del
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {socialMedia.length > 3 && (
-                <p className="text-xs text-secondary-500 mt-2">
-                  And {socialMedia.length - 3} more...
-                </p>
-              )}
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-4">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-md font-medium">Logos</h3>
-                <button
-                  onClick={() => handleAddNew("logos")}
-                  className="btn-primary text-xs"
-                >
-                  Add
-                </button>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {logos.slice(0, 4).map((logo) => (
-                  <div key={logo._id} className="border rounded p-1">
-                    <img
-                      src={logo.url}
-                      alt={logo.name}
-                      className="w-full h-8 object-contain"
-                    />
-                    <div className="flex space-x-1 mt-1">
-                      <button
-                        onClick={() => handleEdit(logo, "logo")}
-                        className="text-xs text-primary-600 hover:text-primary-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete("logo", logo._id)}
-                        className="text-xs text-red-600 hover:text-red-800"
-                      >
-                        Del
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {logos.length > 4 && (
-                <p className="text-xs text-secondary-500 mt-2">
-                  And {logos.length - 4} more...
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Content Section */}
-        <div>
-          <h2 className="text-2xl font-semibold text-secondary-800 mb-4">
-            Content
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">Why Choose Us</h3>
-                <button
-                  onClick={() => handleAddNew("why-choose-us")}
-                  className="btn-primary text-sm"
-                >
-                  Add Feature
-                </button>
-              </div>
-              <div className="space-y-3">
-                {features.slice(0, 3).map((feature) => (
-                  <div key={feature._id} className="border rounded p-3">
-                    <h4 className="font-medium text-sm">{feature.title}</h4>
-                    <p className="text-secondary-600 text-xs line-clamp-2">
-                      {feature.description}
-                    </p>
-                    <div className="flex space-x-1 mt-2">
-                      <button
-                        onClick={() => handleEdit(feature, "feature")}
-                        className="text-xs text-primary-600 hover:text-primary-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete("feature", feature._id)}
-                        className="text-xs text-red-600 hover:text-red-800"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {features.length > 3 && (
-                <p className="text-sm text-secondary-500 mt-2">
-                  And {features.length - 3} more...
-                </p>
-              )}
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">About</h3>
-                <button
-                  onClick={() => handleAddNew("about")}
-                  className="btn-primary text-sm"
-                >
-                  Add Content
-                </button>
-              </div>
-              <div className="space-y-3">
-                {abouts.slice(0, 3).map((about) => (
-                  <div key={about._id} className="border rounded p-3">
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="font-medium text-sm capitalize">
-                        {about.section}
-                      </span>
-                      <span
-                        className={`px-2 py-1 text-xs rounded ${
-                          about.isActive
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {about.isActive ? "Active" : "Inactive"}
-                      </span>
-                    </div>
-                    <h4 className="font-medium text-sm">{about.title}</h4>
-                    <p className="text-secondary-600 text-xs line-clamp-2">
-                      {about.content}
-                    </p>
-                    <div className="flex space-x-1 mt-2">
-                      <button
-                        onClick={() => handleEdit(about, "about")}
-                        className="text-xs text-primary-600 hover:text-primary-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete("about", about._id)}
-                        className="text-xs text-red-600 hover:text-red-800"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {abouts.length > 3 && (
-                <p className="text-sm text-secondary-500 mt-2">
-                  And {abouts.length - 3} more...
-                </p>
-              )}
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">Team</h3>
-                <button
-                  onClick={() => handleAddNew("team")}
-                  className="btn-primary text-sm"
-                >
-                  Add Member
-                </button>
-              </div>
-              <div className="space-y-3">
-                {team.slice(0, 3).map((member) => (
-                  <div key={member._id} className="border rounded p-3">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-sm">
-                        {member.initials}
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-sm">{member.name}</h4>
-                        <p className="text-secondary-600 text-xs">
-                          {member.position}
-                        </p>
+                    Add Feature
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {features.slice(0, 3).map((feature) => (
+                    <div key={feature._id} className="border rounded p-3">
+                      <h4 className="font-medium text-sm">{feature.title}</h4>
+                      <p className="text-secondary-600 text-xs line-clamp-2">
+                        {feature.description}
+                      </p>
+                      <div className="flex space-x-1 mt-2">
+                        <button
+                          onClick={() => handleEdit(feature, "feature")}
+                          className="text-xs text-primary-600 hover:text-primary-800"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete("feature", feature._id)}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
-                    <div className="flex space-x-1">
-                      <button
-                        onClick={() => handleEdit(member, "team")}
-                        className="text-xs text-primary-600 hover:text-primary-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete("team", member._id)}
-                        className="text-xs text-red-600 hover:text-red-800"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                {features.length > 3 && (
+                  <p className="text-sm text-secondary-500 mt-2">
+                    And {features.length - 3} more...
+                  </p>
+                )}
               </div>
-              {team.length > 3 && (
-                <p className="text-sm text-secondary-500 mt-2">
-                  And {team.length - 3} more...
-                </p>
-              )}
+
+              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium">About</h3>
+                  <button
+                    onClick={() => handleAddNew("about")}
+                    className="btn-primary text-sm"
+                  >
+                    Add Content
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {abouts.slice(0, 3).map((about) => (
+                    <div key={about._id} className="border rounded p-3">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-medium text-sm capitalize">
+                          {about.section}
+                        </span>
+                        <span
+                          className={`px-2 py-1 text-xs rounded ${
+                            about.isActive
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {about.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                      <h4 className="font-medium text-sm">{about.title}</h4>
+                      <p className="text-secondary-600 text-xs line-clamp-2">
+                        {about.content}
+                      </p>
+                      <div className="flex space-x-1 mt-2">
+                        <button
+                          onClick={() => handleEdit(about, "about")}
+                          className="text-xs text-primary-600 hover:text-primary-800"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete("about", about._id)}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {abouts.length > 3 && (
+                  <p className="text-sm text-secondary-500 mt-2">
+                    And {abouts.length - 3} more...
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium">Team</h3>
+                  <button
+                    onClick={() => handleAddNew("team")}
+                    className="btn-primary text-sm"
+                  >
+                    Add Member
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {team.slice(0, 3).map((member) => (
+                    <div key={member._id} className="border rounded p-3">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-sm">
+                          {member.initials}
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-sm">{member.name}</h4>
+                          <p className="text-secondary-600 text-xs">
+                            {member.position}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex space-x-1">
+                        <button
+                          onClick={() => handleEdit(member, "team")}
+                          className="text-xs text-primary-600 hover:text-primary-800"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete("team", member._id)}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {team.length > 3 && (
+                  <p className="text-sm text-secondary-500 mt-2">
+                    And {team.length - 3} more...
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Admin Section */}
-        <div>
-          <h2 className="text-2xl font-semibold text-secondary-800 mb-4">
-            Admin
-          </h2>
+        {activeSection === "admin" && (
           <div className="max-w-md">
             <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
               <h3 className="text-lg font-medium mb-4">
@@ -1216,7 +1214,7 @@ const AdminDashboard = ({ token, onLogout }) => {
               )}
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Add/Edit Form */}
