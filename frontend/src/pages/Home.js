@@ -56,25 +56,51 @@ const Home = () => {
         axios.get("/api/team"),
       ]);
 
+      // Ensure data is an array before processing
+      const productsData = Array.isArray(productsRes.data)
+        ? productsRes.data
+        : [];
+      const testimonialsData = Array.isArray(testimonialsRes.data)
+        ? testimonialsRes.data
+        : [];
+      const featuresData = Array.isArray(featuresRes.data)
+        ? featuresRes.data
+        : [];
+      const aboutsData = Array.isArray(aboutsRes.data) ? aboutsRes.data : [];
+      const videosData = Array.isArray(videosRes.data) ? videosRes.data : [];
+      const socialMediaData = Array.isArray(socialMediaRes.data)
+        ? socialMediaRes.data
+        : [];
+      const teamData = Array.isArray(teamRes.data) ? teamRes.data : [];
+
       // Get first 12 products for homepage display
-      setFeaturedProducts(productsRes.data.slice(0, 12));
+      setFeaturedProducts(productsData.slice(0, 12));
       // Get first 3 testimonials
-      setTestimonials(testimonialsRes.data.slice(0, 3));
+      setTestimonials(testimonialsData.slice(0, 3));
       // Get features
-      setFeatures(featuresRes.data);
+      setFeatures(featuresData);
       // Get about content
-      setAbouts(aboutsRes.data);
+      setAbouts(aboutsData);
       // Get videos (filter only videos and get first 6)
-      const videoItems = videosRes.data.filter((item) => item.type === "video");
+      const videoItems = videosData.filter((item) => item.type === "video");
       setVideos(videoItems.slice(0, 6));
       // Get social media links
-      setSocialMedia(socialMediaRes.data);
+      setSocialMedia(socialMediaData);
       // Get team members
-      setTeam(teamRes.data);
+      setTeam(teamData);
       // Store total products count for display
-      setTotalProducts(productsRes.data.length);
+      setTotalProducts(productsData.length);
     } catch (error) {
       console.error("Error fetching data:", error);
+      // Set empty arrays on error to prevent crashes
+      setFeaturedProducts([]);
+      setTestimonials([]);
+      setFeatures([]);
+      setAbouts([]);
+      setVideos([]);
+      setSocialMedia([]);
+      setTeam([]);
+      setTotalProducts(0);
     } finally {
       setLoading(false);
     }
