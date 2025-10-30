@@ -21,9 +21,10 @@ const Testimonials = () => {
   const fetchTestimonials = async () => {
     try {
       const response = await axios.get("/api/testimonials");
-      setTestimonials(response.data);
+      setTestimonials(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error fetching testimonials:", error);
+      setTestimonials([]);
     } finally {
       setLoading(false);
     }

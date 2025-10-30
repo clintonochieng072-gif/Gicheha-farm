@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import GalleryCard from "../components/GalleryCard";
+import VideoCard from "../components/VideoCard";
 import { FaImages, FaFilter } from "react-icons/fa";
 
 const Gallery = () => {
@@ -17,9 +18,10 @@ const Gallery = () => {
   const fetchGallery = async () => {
     try {
       const response = await axios.get("/api/gallery");
-      setGallery(response.data);
+      setGallery(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error fetching gallery:", error);
+      setGallery([]);
     } finally {
       setLoading(false);
     }
@@ -85,9 +87,13 @@ const Gallery = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredGallery.map((item) => (
-            <GalleryCard key={item._id} image={item} />
-          ))}
+          {filteredGallery.map((item) =>
+            item.type === "video" ? (
+              <VideoCard key={item._id} video={item} />
+            ) : (
+              <GalleryCard key={item._id} image={item} />
+            )
+          )}
         </div>
       )}
 

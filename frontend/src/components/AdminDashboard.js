@@ -1195,10 +1195,10 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </div>
                 <button
                   type="submit"
-                  className="w-full btn-primary"
-                  disabled={credentialsLoading}
+                  className="w-full btn-primary opacity-50 cursor-not-allowed"
+                  disabled={true}
                 >
-                  {credentialsLoading ? "Updating..." : "Update Credentials"}
+                  Update Credentials (Disabled)
                 </button>
               </form>
               {credentialsMessage && (
