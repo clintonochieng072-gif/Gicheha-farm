@@ -8,7 +8,6 @@ frontend/node_modules/
 frontend/build/
 
 # Sensitive configuration files
-backend/config/email.js
 backend/.env
 backend/.env.local
 backend/.env.production
