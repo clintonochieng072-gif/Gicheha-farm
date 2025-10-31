@@ -86,17 +86,17 @@ const AdminDashboard = ({ token, onLogout }) => {
         api.get(`/gallery?type=video&t=${Date.now()}`),
       ]);
 
-      setCategories(categoriesResponse.data);
-      setUnits(unitsResponse.data);
-      setProducts(productsResponse.data);
-      setTestimonials(testimonialsResponse.data);
-      setGallery(galleryResponse.data);
-      setSocialMedia(socialMediaResponse.data);
-      setLogos(logosResponse.data);
-      setFeatures(featuresResponse.data);
-      setAbouts(aboutsResponse.data);
-      setTeam(teamResponse.data);
-      setVideos(videosResponse.data);
+      setCategories(categoriesResponse.data || []);
+      setUnits(unitsResponse.data || []);
+      setProducts(productsResponse.data.products || []);
+      setTestimonials(testimonialsResponse.data || []);
+      setGallery(galleryResponse.data || []);
+      setSocialMedia(socialMediaResponse.data || []);
+      setLogos(logosResponse.data || []);
+      setFeatures(featuresResponse.data || []);
+      setAbouts(aboutsResponse.data || []);
+      setTeam(teamResponse.data || []);
+      setVideos(videosResponse.data || []);
     } catch (error) {
       console.error("Error fetching data:", error);
       // If token is invalid, logout
@@ -621,44 +621,45 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {(expandedProducts ? products : products.slice(0, 4)).map(
-                  (product) => (
-                    <div
-                      key={product._id}
-                      className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <img
-                        src={
-                          product.images && product.images.length > 0
-                            ? product.images[0]
-                            : "https://via.placeholder.com/100x75?text=No+Image"
-                        }
-                        alt={product.name}
-                        className="w-full h-20 md:h-24 lg:h-28 object-contain rounded-lg mb-3"
-                      />
-                      <h4 className="font-semibold text-base md:text-lg truncate mb-1">
-                        {product.name}
-                      </h4>
-                      <p className="text-secondary-600 text-sm md:text-base mb-3">
-                        KSh {product.price}
-                      </p>
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleEdit(product, "products")}
-                          className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete("product", product._id)}
-                          className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </div>
+                {(expandedProducts
+                  ? products
+                  : (products || []).slice(0, 4)
+                ).map((product) => (
+                  <div
+                    key={product._id}
+                    className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <img
+                      src={
+                        product.images && product.images.length > 0
+                          ? product.images[0]
+                          : "https://via.placeholder.com/100x75?text=No+Image"
+                      }
+                      alt={product.name}
+                      className="w-full h-20 md:h-24 lg:h-28 object-contain rounded-lg mb-3"
+                    />
+                    <h4 className="font-semibold text-base md:text-lg truncate mb-1">
+                      {product.name}
+                    </h4>
+                    <p className="text-secondary-600 text-sm md:text-base mb-3">
+                      KSh {product.price}
+                    </p>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEdit(product, "products")}
+                        className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete("product", product._id)}
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
+                      >
+                        Delete
+                      </button>
                     </div>
-                  )
-                )}
+                  </div>
+                ))}
               </div>
               {products.length > 4 && (
                 <button

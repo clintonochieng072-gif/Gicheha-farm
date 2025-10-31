@@ -20,6 +20,9 @@ const path = require("path");
 
 const app = express();
 
+// Serve static files from the React app build directory
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+
 // Compression middleware - compress all responses
 app.use(
   compression({
@@ -138,9 +141,14 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "OK", message: "Gicheha Farm Backend is running" });
 });
 
-// 404
-app.use((req, res, next) => {
-  res.status(404).json({ message: "Not Found" });
+// Catch all handler: send back React's index.html file for client-side routing
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
+});
+
+// 404 for API routes
+app.use("/api/*", (req, res, next) => {
+  res.status(404).json({ message: "API endpoint not found" });
 });
 
 // centralized error handler (prints stack in development)

@@ -39,7 +39,8 @@
 
 ## Testing and Monitoring
 
-- [ ] Run Lighthouse performance tests
-- [ ] Monitor network requests in Chrome DevTools
-- [ ] Test mobile performance with throttling
-- [ ] Verify improvements in page load times
+- [x] Run Lighthouse performance tests
+- [x] Monitor network requests in Chrome DevTools
+- [x] Test mobile performance with throttling
+- [x] Verify improvements in page load times
+- [x] Deploy production build to backend server
