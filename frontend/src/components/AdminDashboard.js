@@ -73,17 +73,17 @@ const AdminDashboard = ({ token, onLogout }) => {
         teamResponse,
         videosResponse,
       ] = await Promise.all([
-        api.get("/categories"),
-        api.get("/units"),
-        api.get("/products"),
-        api.get("/testimonials/admin"),
-        api.get("/gallery"),
-        api.get("/social-media"),
-        api.get("/logos"),
-        api.get("/features/admin"),
-        api.get("/about/admin"),
-        api.get("/team"),
-        api.get("/gallery?type=video"),
+        api.get(`/categories?t=${Date.now()}`),
+        api.get(`/units?t=${Date.now()}`),
+        api.get(`/products?t=${Date.now()}`),
+        api.get(`/testimonials/admin?t=${Date.now()}`),
+        api.get(`/gallery?t=${Date.now()}`),
+        api.get(`/social-media?t=${Date.now()}`),
+        api.get(`/logos?t=${Date.now()}`),
+        api.get(`/features/admin?t=${Date.now()}`),
+        api.get(`/about/admin?t=${Date.now()}`),
+        api.get(`/team?t=${Date.now()}`),
+        api.get(`/gallery?type=video&t=${Date.now()}`),
       ]);
 
       setCategories(categoriesResponse.data);

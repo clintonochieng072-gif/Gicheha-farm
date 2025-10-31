@@ -26,13 +26,10 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("/api/products", {
+      const response = await axios.get(`/api/products?t=${Date.now()}`, {
         headers: {
           "Cache-Control": "no-cache",
           Pragma: "no-cache",
-        },
-        params: {
-          _t: Date.now(), // Cache busting parameter
         },
       });
       setProducts(Array.isArray(response.data) ? response.data : []);
