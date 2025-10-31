@@ -71,6 +71,30 @@ app.use("/api/team", teamRoutes);
 // Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Root route
+app.get("/", (req, res) => {
+  res.json({
+    message: "Gicheha Farm Backend API",
+    version: "1.0.0",
+    status: "Running",
+    endpoints: {
+      health: "/api/health",
+      products: "/api/products",
+      testimonials: "/api/testimonials",
+      gallery: "/api/gallery",
+      admin: "/api/admin",
+      categories: "/api/categories",
+      socialMedia: "/api/social-media",
+      logos: "/api/logos",
+      units: "/api/units",
+      features: "/api/features",
+      about: "/api/about",
+      team: "/api/team",
+    },
+    documentation: "API endpoints are available under /api/* paths",
+  });
+});
+
 // Health check route
 app.get("/api/health", (req, res) => {
   res.json({ status: "OK", message: "Gicheha Farm Backend is running" });
