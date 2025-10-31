@@ -122,10 +122,57 @@ exports.updateProduct = async (req, res, next) => {
 // other controller functions (getProducts, getProduct, deleteProduct) should also use next(err) on errors
 exports.getProducts = async (req, res, next) => {
   try {
-    const products = await Product.find({ inStock: true }).sort({
-      createdAt: -1,
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12; // Default 12 products per page
+    const skip = (page - 1) * limit;
+
+    // Build filter object
+    const filter = { inStock: true };
+
+    // Add category filter if provided
+    if (req.query.category && req.query.category !== "all") {
+      filter.category = req.query.category;
+    }
+
+    // Add search filter if provided
+    if (req.query.search) {
+      filter.$or = [
+        { name: { $regex: req.query.search, $options: "i" } },
+        { description: { $regex: req.query.search, $options: "i" } },
+      ];
+    }
+
+    // Build sort object
+    let sort = { createdAt: -1 }; // Default sort by newest
+    if (req.query.sort === "price_asc") {
+      sort = { price: 1 };
+    } else if (req.query.sort === "price_desc") {
+      sort = { price: -1 };
+    } else if (req.query.sort === "name") {
+      sort = { name: 1 };
+    }
+
+    // Execute query with pagination
+    const products = await Product.find(filter)
+      .select("name price images category unit quantity") // Only select needed fields
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .lean(); // Use lean() for better performance
+
+    // Get total count for pagination
+    const total = await Product.countDocuments(filter);
+
+    res.json({
+      products,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalProducts: total,
+        hasNext: page * limit < total,
+        hasPrev: page > 1,
+      },
     });
-    res.json(products);
   } catch (err) {
     console.error("getProducts error:", err);
     next(err);

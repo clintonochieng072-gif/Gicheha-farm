@@ -43,6 +43,15 @@ const Home = () => {
   const [team, setTeam] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingStates, setLoadingStates] = useState({
+    products: true,
+    testimonials: true,
+    features: true,
+    abouts: true,
+    videos: true,
+    socialMedia: true,
+    team: true,
+  });
 
   useEffect(() => {
     fetchData();
@@ -50,70 +59,117 @@ const Home = () => {
 
   const fetchData = async () => {
     try {
-      const [
-        productsRes,
-        testimonialsRes,
-        featuresRes,
-        aboutsRes,
-        videosRes,
-        socialMediaRes,
-        teamRes,
-      ] = await Promise.all([
-        api.get(`/products?t=${Date.now()}`),
-        api.get(`/testimonials?t=${Date.now()}`),
-        api.get(`/features?t=${Date.now()}`),
-        api.get(`/about?t=${Date.now()}`),
-        api.get(`/gallery?t=${Date.now()}`),
-        api.get(`/social-media?t=${Date.now()}`),
-        api.get(`/team?t=${Date.now()}`),
-      ]);
+      // Fetch data with individual loading states for better UX
+      const fetchPromises = [
+        api
+          .get(`/products?limit=12&t=${Date.now()}`)
+          .then((res) => {
+            const productsData = Array.isArray(res.data.products)
+              ? res.data.products
+              : [];
+            setFeaturedProducts(productsData);
+            setTotalProducts(
+              res.data.pagination?.totalProducts || productsData.length
+            );
+            setLoadingStates((prev) => ({ ...prev, products: false }));
+          })
+          .catch((err) => {
+            console.error("Products fetch error:", err);
+            setFeaturedProducts([]);
+            setTotalProducts(0);
+            setLoadingStates((prev) => ({ ...prev, products: false }));
+          }),
 
-      // Ensure data is an array before processing
-      const productsData = Array.isArray(productsRes.data)
-        ? productsRes.data
-        : [];
-      const testimonialsData = Array.isArray(testimonialsRes.data)
-        ? testimonialsRes.data
-        : [];
-      const featuresData = Array.isArray(featuresRes.data)
-        ? featuresRes.data
-        : [];
-      const aboutsData = Array.isArray(aboutsRes.data) ? aboutsRes.data : [];
-      const videosData = Array.isArray(videosRes.data) ? videosRes.data : [];
-      const socialMediaData = Array.isArray(socialMediaRes.data)
-        ? socialMediaRes.data
-        : [];
-      const teamData = Array.isArray(teamRes.data) ? teamRes.data : [];
+        api
+          .get(`/testimonials?t=${Date.now()}`)
+          .then((res) => {
+            const testimonialsData = Array.isArray(res.data)
+              ? res.data.slice(0, 3)
+              : [];
+            setTestimonials(testimonialsData);
+            setLoadingStates((prev) => ({ ...prev, testimonials: false }));
+          })
+          .catch((err) => {
+            console.error("Testimonials fetch error:", err);
+            setTestimonials([]);
+            setLoadingStates((prev) => ({ ...prev, testimonials: false }));
+          }),
 
-      // Get first 12 products for homepage display
-      setFeaturedProducts(productsData.slice(0, 12));
-      // Get first 3 testimonials
-      setTestimonials(testimonialsData.slice(0, 3));
-      // Get features
-      setFeatures(featuresData);
-      // Get about content
-      setAbouts(aboutsData);
-      // Get videos (filter only videos and get first 6)
-      const videoItems = videosData.filter((item) => item.type === "video");
-      setVideos(videoItems.slice(0, 6));
-      // Get social media links
-      setSocialMedia(socialMediaData);
-      // Get team members
-      setTeam(teamData);
-      // Store total products count for display
-      setTotalProducts(productsData.length);
+        api
+          .get(`/features?t=${Date.now()}`)
+          .then((res) => {
+            const featuresData = Array.isArray(res.data) ? res.data : [];
+            setFeatures(featuresData);
+            setLoadingStates((prev) => ({ ...prev, features: false }));
+          })
+          .catch((err) => {
+            console.error("Features fetch error:", err);
+            setFeatures([]);
+            setLoadingStates((prev) => ({ ...prev, features: false }));
+          }),
+
+        api
+          .get(`/about?t=${Date.now()}`)
+          .then((res) => {
+            const aboutsData = Array.isArray(res.data) ? res.data : [];
+            setAbouts(aboutsData);
+            setLoadingStates((prev) => ({ ...prev, abouts: false }));
+          })
+          .catch((err) => {
+            console.error("About fetch error:", err);
+            setAbouts([]);
+            setLoadingStates((prev) => ({ ...prev, abouts: false }));
+          }),
+
+        api
+          .get(`/gallery?t=${Date.now()}`)
+          .then((res) => {
+            const videosData = Array.isArray(res.data) ? res.data : [];
+            const videoItems = videosData
+              .filter((item) => item.type === "video")
+              .slice(0, 6);
+            setVideos(videoItems);
+            setLoadingStates((prev) => ({ ...prev, videos: false }));
+          })
+          .catch((err) => {
+            console.error("Gallery fetch error:", err);
+            setVideos([]);
+            setLoadingStates((prev) => ({ ...prev, videos: false }));
+          }),
+
+        api
+          .get(`/social-media?t=${Date.now()}`)
+          .then((res) => {
+            const socialMediaData = Array.isArray(res.data) ? res.data : [];
+            setSocialMedia(socialMediaData);
+            setLoadingStates((prev) => ({ ...prev, socialMedia: false }));
+          })
+          .catch((err) => {
+            console.error("Social media fetch error:", err);
+            setSocialMedia([]);
+            setLoadingStates((prev) => ({ ...prev, socialMedia: false }));
+          }),
+
+        api
+          .get(`/team?t=${Date.now()}`)
+          .then((res) => {
+            const teamData = Array.isArray(res.data) ? res.data : [];
+            setTeam(teamData);
+            setLoadingStates((prev) => ({ ...prev, team: false }));
+          })
+          .catch((err) => {
+            console.error("Team fetch error:", err);
+            setTeam([]);
+            setLoadingStates((prev) => ({ ...prev, team: false }));
+          }),
+      ];
+
+      await Promise.allSettled(fetchPromises);
+
+      // Set overall loading to false when all requests are complete
+      setLoading(false);
     } catch (error) {
-      console.error("Error fetching data:", error);
-      // Set empty arrays on error to prevent crashes
-      setFeaturedProducts([]);
-      setTestimonials([]);
-      setFeatures([]);
-      setAbouts([]);
-      setVideos([]);
-      setSocialMedia([]);
-      setTeam([]);
-      setTotalProducts(0);
-    } finally {
+      console.error("Error in fetchData:", error);
       setLoading(false);
     }
   };
@@ -422,8 +478,11 @@ const Home = () => {
               latest offerings below.
             </p>
           </div>
-          {loading ? (
-            <div className="text-center py-8">Loading products...</div>
+          {loadingStates.products ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+              <p className="text-secondary-600">Loading products...</p>
+            </div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
@@ -606,8 +665,11 @@ const Home = () => {
               customers.
             </p>
           </div>
-          {loading ? (
-            <div className="text-center py-8">Loading testimonials...</div>
+          {loadingStates.testimonials ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+              <p className="text-secondary-600">Loading testimonials...</p>
+            </div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">

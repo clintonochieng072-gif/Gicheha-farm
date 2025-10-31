@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { FaShoppingCart, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 
 const ProductCard = ({ product, onAddToCart }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -21,10 +23,13 @@ const ProductCard = ({ product, onAddToCart }) => {
   return (
     <div className="card group hover:shadow-lg transition-shadow duration-300">
       <div className="relative overflow-hidden rounded-t-lg">
-        <img
+        <LazyLoadImage
           src={images[currentImageIndex]}
           alt={product.name || "Product"}
           className="w-full h-32 sm:h-40 md:h-48 object-contain group-hover:scale-105 transition-transform duration-300 bg-gray-50"
+          effect="blur"
+          placeholderSrc="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjRjNGNEY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkxvYWRpbmcuLi48L3RleHQ+PC9zdmc+"
+          threshold={100}
         />
         {images.length > 1 && (
           <>

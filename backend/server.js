@@ -3,6 +3,7 @@ require("dotenv").config(); // ensure env loaded before anything else
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const compression = require("compression");
 const connectDB = require("./config/database");
 const productRoutes = require("./routes/productRoutes");
 const testimonialRoutes = require("./routes/testimonialRoutes");
@@ -18,6 +19,22 @@ const teamRoutes = require("./routes/teamRoutes");
 const path = require("path");
 
 const app = express();
+
+// Compression middleware - compress all responses
+app.use(
+  compression({
+    level: 6, // compression level (1-9, 6 is good balance)
+    threshold: 1024, // only compress responses larger than 1KB
+    filter: (req, res) => {
+      // Don't compress responses with this request header
+      if (req.headers["x-no-compression"]) {
+        return false;
+      }
+      // Use compression filter function
+      return compression.filter(req, res);
+    },
+  })
+);
 
 // CORS configuration
 const corsOptions = {
@@ -68,8 +85,29 @@ app.use("/api/features", featureRoutes);
 app.use("/api/about", aboutRoutes);
 app.use("/api/team", teamRoutes);
 
-// Serve static files from uploads directory
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Serve static files from uploads directory with caching headers
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"), {
+    maxAge: "30d", // Cache for 30 days
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, path) => {
+      // Set cache control headers for different file types
+      if (
+        path.endsWith(".jpg") ||
+        path.endsWith(".jpeg") ||
+        path.endsWith(".png") ||
+        path.endsWith(".gif") ||
+        path.endsWith(".webp")
+      ) {
+        res.setHeader("Cache-Control", "public, max-age=31536000"); // 1 year for images
+      } else if (path.endsWith(".css") || path.endsWith(".js")) {
+        res.setHeader("Cache-Control", "public, max-age=86400"); // 1 day for CSS/JS
+      }
+    },
+  })
+);
 
 // Root route
 app.get("/", (req, res) => {

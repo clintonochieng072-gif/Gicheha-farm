@@ -1,27 +1,45 @@
-# TODO: Fix Full-Stack React + Node.js Issues
+# Performance Optimization TODO List
 
-## 1. Image Display Issues
+## Backend Optimizations
 
-- [x] Update GalleryCard.js to use `object-contain` and responsive heights
-- [x] Update VideoCard.js to use `object-contain` and responsive heights
-- [x] Update ProductCard.js to use `object-contain` and responsive heights
+- [x] Install compression middleware for Express
+- [x] Add caching headers for static files
+- [x] Add MongoDB indexes to Admin model (email)
+- [x] Add MongoDB indexes to Product model (inStock, category, createdAt)
+- [x] Add MongoDB indexes to other models (Testimonial, Gallery, etc.)
+- [x] Implement pagination for products API endpoint
+- [x] Implement pagination for testimonials API endpoint
+- [x] Implement pagination for gallery API endpoint
+- [x] Optimize queries to select only necessary fields
+- [x] Add proper error handling and response compression
 
-## 2. Admin Changes Not Reflecting in Public View
+## Frontend Optimizations
 
-- [x] Replace axios imports with api imports in Home.js
-- [x] Replace axios imports with api imports in Products.js
-- [x] Replace axios imports with api imports in Gallery.js
-- [x] Replace axios imports with api imports in Testimonials.js
-- [x] Update all axios.get calls to api.get in public pages
+- [x] Install react-lazy-load-image-component for image lazy loading
+- [x] Implement React.lazy and Suspense for route-based code-splitting
+- [x] Add lazy loading to ProductCard component
+- [x] Add lazy loading to GalleryCard component
+- [x] Add lazy loading to VideoCard component
+- [x] Add loading indicators to all API operations
+- [x] Optimize Home component with useMemo and React.memo
+- [x] Convert images to WebP format where possible
+- [x] Add loading states to components
 
-## 3. Edit Button Functionality
+## Database Optimizations
 
-- [x] Improve button sizes in AdminDashboard.js for mobile responsiveness
-- [x] Ensure Edit buttons are visible and functional on mobile
+- [x] Create compound indexes for complex queries
+- [x] Index authentication fields for faster login
+- [x] Add indexes to frequently filtered fields
 
-## 4. General Improvements
+## Mobile Performance
 
-- [x] Clear old build cache
-- [x] Rebuild frontend using `npm run build --prefix frontend`
-- [x] Fix admin dashboard image display to use `object-contain` and responsive heights
-- [ ] Test all fixes locally
+- [x] Ensure responsive image loading
+- [x] Optimize CSS for mobile-first approach
+- [x] Reduce bundle size with tree-shaking
+
+## Testing and Monitoring
+
+- [ ] Run Lighthouse performance tests
+- [ ] Monitor network requests in Chrome DevTools
+- [ ] Test mobile performance with throttling
+- [ ] Verify improvements in page load times

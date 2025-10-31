@@ -9,6 +9,7 @@ const adminSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      index: true, // Index for faster login queries
     },
     password: {
       type: String,
