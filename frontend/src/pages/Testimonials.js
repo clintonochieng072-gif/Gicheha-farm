@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../utils/api";
 import TestimonialCard from "../components/TestimonialCard";
 import { FaStar, FaQuoteLeft } from "react-icons/fa";
 
@@ -20,7 +20,7 @@ const Testimonials = () => {
 
   const fetchTestimonials = async () => {
     try {
-      const response = await axios.get(`/api/testimonials?t=${Date.now()}`);
+      const response = await api.get(`/testimonials?t=${Date.now()}`);
       setTestimonials(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error fetching testimonials:", error);
@@ -44,7 +44,7 @@ const Testimonials = () => {
     setSubmitMessage("");
 
     try {
-      await axios.post("/api/testimonials", formData);
+      await api.post("/testimonials", formData);
       setSubmitMessage(
         "Thank you for your testimonial! It will be reviewed before being published."
       );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../utils/api";
 import GalleryCard from "../components/GalleryCard";
 import VideoCard from "../components/VideoCard";
 import { FaImages, FaFilter } from "react-icons/fa";
@@ -17,12 +17,7 @@ const Gallery = () => {
 
   const fetchGallery = async () => {
     try {
-      const response = await axios.get(`/api/gallery?t=${Date.now()}`, {
-        headers: {
-          "Cache-Control": "no-cache",
-          Pragma: "no-cache",
-        },
-      });
+      const response = await api.get(`/gallery?t=${Date.now()}`);
       setGallery(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error fetching gallery:", error);

@@ -634,7 +634,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                             : "https://via.placeholder.com/100x75?text=No+Image"
                         }
                         alt={product.name}
-                        className="w-full h-20 object-cover rounded-lg mb-3"
+                        className="w-full h-20 md:h-24 lg:h-28 object-contain rounded-lg mb-3"
                       />
                       <h4 className="font-semibold text-base md:text-lg truncate mb-1">
                         {product.name}
@@ -644,14 +644,14 @@ const AdminDashboard = ({ token, onLogout }) => {
                       </p>
                       <div className="flex space-x-2">
                         <button
-                          onClick={() => handleEdit(product, "product")}
-                          className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
+                          onClick={() => handleEdit(product, "products")}
+                          className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-4 py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete("product", product._id)}
-                          className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
+                          className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
                         >
                           Delete
                         </button>
@@ -698,7 +698,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                         <img
                           src={item.image}
                           alt={item.title}
-                          className="w-full h-20 object-cover rounded-lg mb-2"
+                          className="w-full h-20 md:h-24 lg:h-28 object-contain rounded-lg mb-2"
                         />
                         <p className="text-sm md:text-base truncate font-medium mb-2">
                           {item.title}
@@ -752,7 +752,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                       >
                         <video
                           src={video.video}
-                          className="w-full h-20 object-cover rounded-lg mb-2"
+                          className="w-full h-20 md:h-24 lg:h-28 object-contain rounded-lg mb-2"
                         />
                         <p className="text-sm md:text-base truncate font-medium mb-2">
                           {video.title}
@@ -960,7 +960,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                       <img
                         src={logo.url}
                         alt={logo.name}
-                        className="w-full h-12 object-cover rounded-lg mb-2"
+                        className="w-full h-12 md:h-16 lg:h-20 object-contain rounded-lg mb-2"
                       />
                       <div className="flex space-x-2">
                         <button

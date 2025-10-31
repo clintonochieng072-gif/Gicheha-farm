@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import ProductCard from "../components/ProductCard";
 import TestimonialCard from "../components/TestimonialCard";
 import VideoCard from "../components/VideoCard";
@@ -59,13 +59,13 @@ const Home = () => {
         socialMediaRes,
         teamRes,
       ] = await Promise.all([
-        axios.get(`/api/products?t=${Date.now()}`),
-        axios.get(`/api/testimonials?t=${Date.now()}`),
-        axios.get(`/api/features?t=${Date.now()}`),
-        axios.get(`/api/about?t=${Date.now()}`),
-        axios.get(`/api/gallery?t=${Date.now()}`),
-        axios.get(`/api/social-media?t=${Date.now()}`),
-        axios.get(`/api/team?t=${Date.now()}`),
+        api.get(`/products?t=${Date.now()}`),
+        api.get(`/testimonials?t=${Date.now()}`),
+        api.get(`/features?t=${Date.now()}`),
+        api.get(`/about?t=${Date.now()}`),
+        api.get(`/gallery?t=${Date.now()}`),
+        api.get(`/social-media?t=${Date.now()}`),
+        api.get(`/team?t=${Date.now()}`),
       ]);
 
       // Ensure data is an array before processing

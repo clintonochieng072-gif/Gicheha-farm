@@ -6,7 +6,7 @@ const VideoCard = ({ video }) => {
       <div className="relative">
         <video
           src={video.video}
-          className="w-full h-48 object-contain bg-gray-50"
+          className="w-full h-32 sm:h-40 md:h-48 object-contain bg-gray-50"
           controls
           preload="metadata"
         />

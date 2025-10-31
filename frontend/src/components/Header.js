@@ -85,7 +85,7 @@ const Header = () => {
                 <img
                   src={logo.url}
                   alt={logo.name}
-                  className="h-24 w-auto max-w-[500px] object-contain"
+                  className="h-24 w-auto max-w-[500px] object-cover"
                   onError={(e) => {
                     e.target.style.display = "none";
                     e.target.nextElementSibling.style.display = "flex";

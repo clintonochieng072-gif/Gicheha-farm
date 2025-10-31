@@ -64,7 +64,7 @@ const Cart = () => {
                   : "https://via.placeholder.com/100x100?text=No+Image"
               }
               alt={item.name}
-              className="w-20 h-20 object-contain rounded"
+              className="w-20 h-20 object-cover rounded"
             />
 
             <div className="flex-1">

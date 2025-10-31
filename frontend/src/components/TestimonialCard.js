@@ -21,7 +21,7 @@ const TestimonialCard = ({ testimonial }) => {
           <img
             src={testimonial.image}
             alt={testimonial.name}
-            className="w-12 h-12 rounded-full object-contain"
+            className="w-12 h-12 rounded-full object-cover"
           />
         ) : (
           <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">

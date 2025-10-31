@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
+import api from "../utils/api";
 import ProductCard from "../components/ProductCard";
 import { FaSearch, FaFilter } from "react-icons/fa";
 import { CartContext } from "../context/CartContext";
@@ -26,12 +26,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`/api/products?t=${Date.now()}`, {
-        headers: {
-          "Cache-Control": "no-cache",
-          Pragma: "no-cache",
-        },
-      });
+      const response = await api.get(`/products?t=${Date.now()}`);
       setProducts(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error fetching products:", error);

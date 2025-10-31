@@ -24,7 +24,7 @@ const ProductCard = ({ product, onAddToCart }) => {
         <img
           src={images[currentImageIndex]}
           alt={product.name || "Product"}
-          className="w-full h-48 object-contain group-hover:scale-105 transition-transform duration-300 bg-gray-50"
+          className="w-full h-32 sm:h-40 md:h-48 object-contain group-hover:scale-105 transition-transform duration-300 bg-gray-50"
         />
         {images.length > 1 && (
           <>

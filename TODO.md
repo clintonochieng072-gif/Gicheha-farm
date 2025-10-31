@@ -1,25 +1,27 @@
-# TODO: Add Password Reset and Admin Credential Management
+# TODO: Fix Full-Stack React + Node.js Issues
 
-## Backend Changes
+## 1. Image Display Issues
 
-- [x] Add password reset token fields to Admin model (resetToken, resetTokenExpiry)
-- [x] Install nodemailer for email sending
-- [x] Add password reset routes: request reset, verify token, reset password
-- [x] Add admin credential update route (change password/email)
+- [x] Update GalleryCard.js to use `object-contain` and responsive heights
+- [x] Update VideoCard.js to use `object-contain` and responsive heights
+- [x] Update ProductCard.js to use `object-contain` and responsive heights
 
-## Frontend Changes
+## 2. Admin Changes Not Reflecting in Public View
 
-- [x] Add "Forgot Password" button to AdminLogin component
-- [x] Create ForgotPassword component with email input
-- [x] Create ResetPassword component for new password entry
-- [x] Add "Change Credentials" section to AdminDashboard
+- [x] Replace axios imports with api imports in Home.js
+- [x] Replace axios imports with api imports in Products.js
+- [x] Replace axios imports with api imports in Gallery.js
+- [x] Replace axios imports with api imports in Testimonials.js
+- [x] Update all axios.get calls to api.get in public pages
 
-## Configuration
+## 3. Edit Button Functionality
 
-- [x] Configure email service settings (Gmail SMTP or similar)
+- [x] Improve button sizes in AdminDashboard.js for mobile responsiveness
+- [x] Ensure Edit buttons are visible and functional on mobile
 
-## Testing
+## 4. General Improvements
 
-- [x] Test email sending functionality
-- [x] Test password reset flow
-- [x] Test credential update functionality
+- [x] Clear old build cache
+- [x] Rebuild frontend using `npm run build --prefix frontend`
+- [x] Fix admin dashboard image display to use `object-contain` and responsive heights
+- [ ] Test all fixes locally
