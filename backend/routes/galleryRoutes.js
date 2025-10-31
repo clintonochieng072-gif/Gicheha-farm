@@ -59,7 +59,7 @@ router.post(
   "/",
   protect,
   admin,
-  upload.single("file"),
+  upload.single("image"),
   galleryValidation,
   createGalleryImage
 );
@@ -67,7 +67,7 @@ router.put(
   "/:id",
   protect,
   admin,
-  upload.single("file"),
+  upload.single("image"),
   galleryValidation,
   updateGalleryImage
 );

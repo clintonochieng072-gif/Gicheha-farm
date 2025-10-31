@@ -82,7 +82,7 @@ const AdminDashboard = ({ token, onLogout }) => {
         api.get(`/logos?t=${Date.now()}`),
         api.get(`/features/admin?t=${Date.now()}`),
         api.get(`/about/admin?t=${Date.now()}`),
-        api.get(`/team?t=${Date.now()}`),
+        api.get(`/team/admin?t=${Date.now()}`), // Use the new admin route
         api.get(`/gallery?type=video&t=${Date.now()}`),
       ]);
 
@@ -220,10 +220,22 @@ const AdminDashboard = ({ token, onLogout }) => {
       // Add all form fields to FormData, including empty strings for optional fields
       Object.keys(formData).forEach((key) => {
         if (formData[key] !== null && formData[key] !== undefined) {
-          if (key === "images" && formData[key]) {
+          if (key === "images" && formData[key] instanceof FileList) {
             // Handle multiple files
+            // Only append images if they are new files (FileList object).
             for (let i = 0; i < formData[key].length; i++) {
               formDataToSend.append("images", formData[key][i]);
+            }
+          } else if (key === "image" && formData[key] instanceof File) {
+            // Handle single file for testimonials, logos, etc.
+            formDataToSend.append("image", formData[key]);
+          } else if (key !== "images" && key !== "image") {
+            // Append other fields, but not file input fields that are empty
+            if (
+              !(formData[key] instanceof FileList) &&
+              !(formData[key] instanceof File)
+            ) {
+              formDataToSend.append(key, formData[key]);
             }
           } else {
             formDataToSend.append(key, formData[key]);
@@ -1046,7 +1058,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                         </button>
                       )}
                       <button
-                        onClick={() => handleEdit(testimonial, "testimonial")}
+                        onClick={() => handleEdit(testimonial, "testimonials")}
                         className="bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
                       >
                         Edit
@@ -1101,7 +1113,7 @@ const AdminDashboard = ({ token, onLogout }) => {
                         </p>
                         <div className="flex space-x-2">
                           <button
-                            onClick={() => handleEdit(feature, "feature")}
+                            onClick={() => handleEdit(feature, "why-choose-us")}
                             className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
                           >
                             Edit
@@ -1195,72 +1207,14 @@ const AdminDashboard = ({ token, onLogout }) => {
                   </button>
                 )}
               </div>
-
-              <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium">Team</h3>
-                  <button
-                    onClick={() => handleAddNew("team")}
-                    className="btn-primary text-sm"
-                  >
-                    Add Member
-                  </button>
-                </div>
-                <div className="space-y-4">
-                  {(expandedTeam ? team : team.slice(0, 3)).map((member) => (
-                    <div
-                      key={member._id}
-                      className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-center space-x-4 mb-3">
-                        <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-base md:text-lg">
-                          {member.initials}
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-base md:text-lg">
-                            {member.name}
-                          </h4>
-                          <p className="text-secondary-600 text-sm md:text-base">
-                            {member.position}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleEdit(member, "team")}
-                          className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete("team", member._id)}
-                          className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {team.length > 3 && (
-                  <button
-                    onClick={() => setExpandedTeam(!expandedTeam)}
-                    className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
-                  >
-                    {expandedTeam
-                      ? "Show Less"
-                      : `Show ${team.length - 3} More...`}
-                  </button>
-                )}
-              </div>
             </div>
           </div>
         )}
 
         {/* Admin Section */}
         {activeSection === "admin" && (
-          <div className="max-w-md">
-            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6 lg:col-span-1">
               <h3 className="text-lg font-medium mb-4">
                 Credentials Management
               </h3>
@@ -1337,6 +1291,72 @@ const AdminDashboard = ({ token, onLogout }) => {
                 </div>
               )}
             </div>
+            <div className="bg-white rounded-lg shadow-sm border border-secondary-200 p-6 lg:col-span-1">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium">Team Management</h3>
+                <button
+                  onClick={() => handleAddNew("team")}
+                  className="btn-primary text-sm"
+                >
+                  Add Member
+                </button>
+              </div>
+              <div className="space-y-4">
+                {(expandedTeam ? team : team.slice(0, 3)).map((member) => (
+                  <div
+                    key={member._id}
+                    className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center space-x-4 mb-3">
+                      {member.image ? (
+                        <img
+                          src={member.image}
+                          alt={member.name}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-base md:text-lg">
+                          {member.initials || member.name?.charAt(0) || "A"}
+                        </div>
+                      )}
+
+                      <div>
+                        <h4 className="font-semibold text-base md:text-lg">
+                          {member.name}
+                        </h4>
+                        <p className="text-secondary-600 text-sm md:text-base">
+                          {member.position}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEdit(member, "team")}
+                        className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete("team", member._id)}
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm md:text-base font-medium transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {team.length > 3 && (
+                <button
+                  onClick={() => setExpandedTeam(!expandedTeam)}
+                  className="mt-4 text-primary-600 hover:text-primary-800 text-sm md:text-base font-medium underline transition-colors"
+                >
+                  {expandedTeam
+                    ? "Show Less"
+                    : `Show ${team.length - 3} More...`}
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -1346,9 +1366,9 @@ const AdminDashboard = ({ token, onLogout }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-semibold mb-4">
-              {editingItem
-                ? `Edit ${currentFormType.slice(0, -1)}`
-                : `Add New ${currentFormType.slice(0, -1)}`}
+              {editingItem && editingItem.type
+                ? `Edit ${editingItem.type.replace(/s$/, "")}`
+                : `Add New ${currentFormType.replace(/s$/, "")}`}
             </h3>
             <form onSubmit={handleFormSubmit} className="space-y-4">
               {currentFormType === "products" && (

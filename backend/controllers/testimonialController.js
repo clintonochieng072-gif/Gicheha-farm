@@ -58,6 +58,45 @@ const createTestimonial = async (req, res) => {
   }
 };
 
+// @desc    Update testimonial
+// @route   PUT /api/testimonials/:id
+// @access  Private (Admin)
+const updateTestimonial = async (req, res) => {
+  try {
+    const testimonial = await Testimonial.findById(req.params.id);
+
+    if (!testimonial) {
+      return res.status(404).json({ message: "Testimonial not found" });
+    }
+
+    const { name, message, rating, isApproved } = req.body;
+
+    // Update fields if they are provided in the request
+    if (name !== undefined) testimonial.name = name;
+    if (message !== undefined) testimonial.message = message;
+    if (rating !== undefined) testimonial.rating = rating;
+    if (isApproved !== undefined)
+      testimonial.isApproved = isApproved === "true" || isApproved === true;
+
+    // Handle image update
+    if (req.file) {
+      // Optional: Delete old image from Cloudinary if you want to save space
+      // if (testimonial.image) { ... }
+
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "gicheha-farm/testimonials",
+      });
+      testimonial.image = result.secure_url;
+    }
+
+    const updatedTestimonial = await testimonial.save();
+    res.json(updatedTestimonial);
+  } catch (error) {
+    console.error("Error updating testimonial:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Approve testimonial
 // @route   PUT /api/testimonials/:id/approve
 // @access  Private (Admin)
@@ -99,6 +138,7 @@ module.exports = {
   getTestimonials,
   getAllTestimonials,
   createTestimonial,
+  updateTestimonial,
   approveTestimonial,
   deleteTestimonial,
 };

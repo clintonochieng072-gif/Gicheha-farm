@@ -6,6 +6,7 @@ const {
   getTestimonials,
   getAllTestimonials,
   createTestimonial,
+  updateTestimonial,
   approveTestimonial,
   deleteTestimonial,
 } = require("../controllers/testimonialController");
@@ -54,6 +55,7 @@ router.post(
 
 // Protected routes (Admin only)
 router.get("/admin", protect, admin, getAllTestimonials);
+router.put("/:id", protect, admin, upload.single("image"), updateTestimonial);
 router.put("/:id/approve", protect, admin, approveTestimonial);
 router.delete("/:id", protect, admin, deleteTestimonial);
 

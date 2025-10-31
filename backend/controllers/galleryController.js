@@ -24,7 +24,7 @@ const createGalleryImage = async (req, res) => {
     const { title, description, category, type } = req.body;
 
     if (!req.file) {
-      return res.status(400).json({ message: "File is required" });
+      return res.status(400).json({ message: "Image is required" });
     }
 
     const itemType = type || "image";

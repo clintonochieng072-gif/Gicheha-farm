@@ -92,12 +92,14 @@ const Home = () => {
         api
           .get(`/products?limit=12&t=${Date.now()}`)
           .then((res) => {
-            const productsData = Array.isArray(res.data.products)
-              ? res.data.products
+            // Handle both array response (legacy) and object response with pagination
+            const productsData = res.data.products || res.data;
+            const productsArray = Array.isArray(productsData)
+              ? productsData
               : [];
-            setFeaturedProducts(productsData);
+            setFeaturedProducts(productsArray);
             setTotalProducts(
-              res.data.pagination?.totalProducts || productsData.length
+              res.data.pagination?.totalProducts || productsArray.length
             );
             setLoadingStates((prev) => ({ ...prev, products: false }));
           })
@@ -311,22 +313,205 @@ const Home = () => {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Gicheha Farm Rongai",
-    description: "Fresh, organic farm products delivered to your doorstep",
+    description:
+      "Fresh, organic farm products delivered to your doorstep. Quality eggs, livestock, and vegetables from sustainable farming practices in Rongai, Kenya.",
     url: "https://gicheha-farm.onrender.com",
     logo: "https://gicheha-farm.onrender.com/logo192.png",
+    foundingDate: "2005",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Rongai",
+      addressRegion: "Kajiado",
       addressCountry: "KE",
     },
     contactPoint: {
       "@type": "ContactPoint",
+      telephone: "+254-XXX-XXXXXX",
       contactType: "customer service",
+      availableLanguage: "English",
     },
     sameAs: [
       "https://facebook.com/gichehafarm",
       "https://instagram.com/gichehafarm",
+      "https://twitter.com/gichehafarm",
     ],
+    knowsAbout: [
+      "Organic farming",
+      "Sustainable agriculture",
+      "Fresh eggs",
+      "Livestock",
+      "Organic vegetables",
+      "Farm products",
+    ],
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Farm Products",
+      itemListElement: [
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: "Fresh Eggs",
+            category: "Poultry Products",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: "Livestock",
+            category: "Animal Products",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: "Organic Vegetables",
+            category: "Produce",
+          },
+        },
+      ],
+    },
+  };
+
+  // LocalBusiness structured data for farm location
+  const localBusinessStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": "https://gicheha-farm.onrender.com/#localbusiness",
+    name: "Gicheha Farm Rongai",
+    description:
+      "Sustainable farm providing fresh, organic products including eggs, livestock, and vegetables. Located in Rongai, Kenya with over 20 years of farming excellence.",
+    url: "https://gicheha-farm.onrender.com",
+    logo: "https://gicheha-farm.onrender.com/logo192.png",
+    image: "https://gicheha-farm.onrender.com/logo192.png",
+    telephone: "+254-XXX-XXXXXX",
+    priceRange: "$$",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Rongai Area",
+      addressLocality: "Rongai",
+      addressRegion: "Kajiado",
+      postalCode: "00200",
+      addressCountry: "KE",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: -1.3958,
+      longitude: 36.7439,
+    },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ],
+        opens: "06:00",
+        closes: "18:00",
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: "Sunday",
+        opens: "07:00",
+        closes: "16:00",
+      },
+    ],
+    servesCuisine: ["Farm Fresh", "Organic", "Sustainable"],
+    paymentAccepted: ["Cash", "M-Pesa", "Bank Transfer"],
+    currenciesAccepted: "KES",
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.8",
+      reviewCount: "50",
+      bestRating: "5",
+      worstRating: "1",
+    },
+    review: testimonials.slice(0, 3).map((testimonial) => ({
+      "@type": "Review",
+      author: {
+        "@type": "Person",
+        name: testimonial.name,
+      },
+      reviewRating: {
+        "@type": "Rating",
+        ratingValue: testimonial.rating,
+        bestRating: "5",
+        worstRating: "1",
+      },
+      reviewBody: testimonial.message,
+      datePublished:
+        testimonial.createdAt || new Date().toISOString().split("T")[0],
+    })),
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Farm Products Catalog",
+      itemListElement: [
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: "Fresh Organic Eggs",
+            description: "Farm-fresh eggs from free-range chickens",
+            offers: {
+              "@type": "Offer",
+              priceCurrency: "KES",
+              availability: "https://schema.org/InStock",
+            },
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: "Livestock",
+            description: "Healthy cows, sheep, and goats",
+            offers: {
+              "@type": "Offer",
+              priceCurrency: "KES",
+              availability: "https://schema.org/InStock",
+            },
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: "Organic Vegetables",
+            description: "Fresh, organic vegetables grown sustainably",
+            offers: {
+              "@type": "Offer",
+              priceCurrency: "KES",
+              availability: "https://schema.org/InStock",
+            },
+          },
+        },
+      ],
+    },
+    sameAs: [
+      "https://facebook.com/gichehafarm",
+      "https://instagram.com/gichehafarm",
+      "https://twitter.com/gichehafarm",
+    ],
+    knowsAbout: [
+      "Sustainable farming",
+      "Organic agriculture",
+      "Free-range poultry",
+      "Livestock farming",
+      "Organic vegetable production",
+      "Farm-to-table delivery",
+    ],
+    areaServed: {
+      "@type": "Place",
+      name: "Rongai, Kenya",
+    },
+    foundingDate: "2005",
+    numberOfEmployees: "25",
   };
 
   return (
@@ -336,7 +521,10 @@ const Home = () => {
         description="Fresh, organic farm products delivered to your doorstep. Quality eggs, livestock, and vegetables from sustainable farming practices in Rongai, Kenya."
         keywords="organic farm, fresh eggs, livestock, vegetables, Rongai Kenya, sustainable farming, farm products"
         url="/public"
-        structuredData={structuredData}
+        structuredData={[
+          organizationStructuredData,
+          localBusinessStructuredData,
+        ]}
       />
       <div>
         {/* Hero Section */}

@@ -1,42 +1,7 @@
 const Team = require("../models/Team");
-const multer = require("multer");
+const cloudinary = require("../config/cloudinary");
 const path = require("path");
 const fs = require("fs");
-
-// Configure multer for image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, "../uploads/team");
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, "team-" + uniqueSuffix + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif/;
-    const extname = allowedTypes.test(
-      path.extname(file.originalname).toLowerCase()
-    );
-    const mimetype = allowedTypes.test(file.mimetype);
-
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error("Only image files are allowed!"));
-    }
-  },
-});
 
 // Get all team members
 exports.getAllTeamMembers = async (req, res) => {
@@ -45,6 +10,18 @@ exports.getAllTeamMembers = async (req, res) => {
     res.json(teamMembers);
   } catch (error) {
     console.error("Error fetching team members:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get all team members for admin
+exports.getAllTeamMembersAdmin = async (req, res) => {
+  try {
+    // Fetch all members, active or not, for the admin panel
+    const teamMembers = await Team.find({}).sort({ order: 1 });
+    res.json(teamMembers);
+  } catch (error) {
+    console.error("Error fetching all team members for admin:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -72,13 +49,20 @@ exports.createTeamMember = async (req, res) => {
       return res.status(400).json({ message: "Image is required" });
     }
 
-    const imageUrl = `/uploads/team/${req.file.filename}`;
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "gicheha-farm/team",
+    });
+
+    // Clean up local file
+    fs.unlinkSync(req.file.path);
 
     const teamMember = new Team({
       name,
       position,
       bio,
-      image: imageUrl,
+      image: result.secure_url,
+      public_id: result.public_id,
       initials,
       order: order || 0,
     });
@@ -112,14 +96,21 @@ exports.updateTeamMember = async (req, res) => {
 
     // Handle image update
     if (req.file) {
-      // Delete old image if it exists
-      if (teamMember.image) {
-        const oldImagePath = path.join(__dirname, "..", teamMember.image);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
+      // Delete old image from Cloudinary
+      if (teamMember.public_id) {
+        await cloudinary.uploader.destroy(teamMember.public_id);
       }
-      teamMember.image = `/uploads/team/${req.file.filename}`;
+
+      // Upload new image to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "gicheha-farm/team",
+      });
+
+      teamMember.image = result.secure_url;
+      teamMember.public_id = result.public_id;
+
+      // Clean up local file
+      fs.unlinkSync(req.file.path);
     }
 
     await teamMember.save();
@@ -139,12 +130,9 @@ exports.deleteTeamMember = async (req, res) => {
       return res.status(404).json({ message: "Team member not found" });
     }
 
-    // Delete image file
-    if (teamMember.image) {
-      const imagePath = path.join(__dirname, "..", teamMember.image);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
+    // Delete image from Cloudinary
+    if (teamMember.public_id) {
+      await cloudinary.uploader.destroy(teamMember.public_id);
     }
 
     await Team.findByIdAndDelete(req.params.id);
@@ -154,6 +142,3 @@ exports.deleteTeamMember = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-// Upload middleware
-exports.uploadImage = upload.single("image");

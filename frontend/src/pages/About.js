@@ -3,6 +3,45 @@ import { FaLeaf, FaUsers, FaAward, FaHeart } from "react-icons/fa";
 import SEO from "../components/SEO";
 
 const About = () => {
+  // Structured data for About page
+  const aboutPageStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    name: "About Gicheha Farm Rongai",
+    description:
+      "Learn about Gicheha Farm Rongai's journey, values, and commitment to sustainable farming. Discover our story of providing fresh, organic produce for over 20 years.",
+    url: "https://gicheha-farm.onrender.com/public/about",
+    mainEntity: {
+      "@type": "Organization",
+      name: "Gicheha Farm Rongai",
+      description:
+        "Sustainable farm providing fresh, organic products including eggs, livestock, and vegetables. Located in Rongai, Kenya with over 20 years of farming excellence.",
+      foundingDate: "2005",
+      numberOfEmployees: "25",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Rongai",
+        addressRegion: "Kajiado",
+        addressCountry: "KE",
+      },
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: "+254-XXX-XXXXXX",
+        contactType: "customer service",
+      },
+      sameAs: [
+        "https://facebook.com/gichehafarm",
+        "https://instagram.com/gichehafarm",
+      ],
+      knowsAbout: [
+        "Sustainable farming",
+        "Organic agriculture",
+        "Community development",
+        "Environmental stewardship",
+      ],
+    },
+  };
+
   const values = [
     {
       icon: <FaLeaf className="text-primary-600 text-3xl" />,
@@ -58,6 +97,7 @@ const About = () => {
         description="Learn about Gicheha Farm Rongai's journey, values, and commitment to sustainable farming. Discover our story of providing fresh, organic produce for over 20 years."
         keywords="about Gicheha Farm, sustainable farming, organic produce, farm story, Rongai Kenya, farming values, team"
         url="/public/about"
+        structuredData={aboutPageStructuredData}
       />
       <div>
         {/* Hero Section */}

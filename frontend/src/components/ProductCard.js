@@ -97,10 +97,7 @@ const ProductCard = ({ product, onAddToCart }) => {
           </span>
           <button
             onClick={() => onAddToCart && onAddToCart(product)}
-            className={`btn-primary flex items-center space-x-2 ${
-              !product.inStock ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={!product.inStock}
+            className="btn-primary flex items-center space-x-2"
           >
             <FaShoppingCart size={14} />
             <span>Add to Cart</span>

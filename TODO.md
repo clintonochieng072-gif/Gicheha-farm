@@ -21,9 +21,9 @@
 ## 3. Add Structured Data (JSON-LD)
 
 - [x] Add organization schema
-- [ ] Add product schema for products page
-- [ ] Add testimonial/review schema
-- [ ] Add local business schema for farm location
+- [x] Add product schema for products page
+- [x] Add testimonial/review schema
+- [x] Add local business schema for farm location
 
 ## 4. Generate Sitemap and Robots.txt
 

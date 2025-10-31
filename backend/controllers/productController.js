@@ -13,7 +13,7 @@ const uploadFilesToCloudinary = async (files) => {
   // Optionally remove local files after upload
   files.forEach((file) => {
     try {
-      fs.unlink(file.path, () => {});
+      fs.unlinkSync(file.path);
     } catch (e) {
       // noop
     }
