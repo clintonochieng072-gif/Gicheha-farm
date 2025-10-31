@@ -1,46 +1,77 @@
-# Performance Optimization TODO List
+# SEO Optimization TODO List
 
-## Backend Optimizations
+## 1. Install SEO Dependencies
 
-- [x] Install compression middleware for Express
-- [x] Add caching headers for static files
-- [x] Add MongoDB indexes to Admin model (email)
-- [x] Add MongoDB indexes to Product model (inStock, category, createdAt)
-- [x] Add MongoDB indexes to other models (Testimonial, Gallery, etc.)
-- [x] Implement pagination for products API endpoint
-- [x] Implement pagination for testimonials API endpoint
-- [x] Implement pagination for gallery API endpoint
-- [x] Optimize queries to select only necessary fields
-- [x] Add proper error handling and response compression
+- [x] Add react-helmet-async for dynamic meta tags
+- [ ] Add prerender-spa-plugin for static HTML generation
+- [x] Add sharp for image optimization
+- [x] Update frontend/package.json with new dependencies
 
-## Frontend Optimizations
+## 2. Implement Dynamic Meta Tags
 
-- [x] Install react-lazy-load-image-component for image lazy loading
-- [x] Implement React.lazy and Suspense for route-based code-splitting
-- [x] Add lazy loading to ProductCard component
-- [x] Add lazy loading to GalleryCard component
-- [x] Add lazy loading to VideoCard component
-- [x] Add loading indicators to all API operations
-- [x] Optimize Home component with useMemo and React.memo
-- [x] Convert images to WebP format where possible
-- [x] Add loading states to components
+- [x] Create SEO component using react-helmet-async
+- [x] Add SEO wrapper to App.js
+- [x] Implement page-specific meta tags for:
+  - [x] Home page
+  - [x] About page
+  - [ ] Products page
+  - [ ] Testimonials page
+  - [ ] Gallery page
 
-## Database Optimizations
+## 3. Add Structured Data (JSON-LD)
 
-- [x] Create compound indexes for complex queries
-- [x] Index authentication fields for faster login
-- [x] Add indexes to frequently filtered fields
+- [x] Add organization schema
+- [ ] Add product schema for products page
+- [ ] Add testimonial/review schema
+- [ ] Add local business schema for farm location
 
-## Mobile Performance
+## 4. Generate Sitemap and Robots.txt
 
-- [x] Ensure responsive image loading
-- [x] Optimize CSS for mobile-first approach
-- [x] Reduce bundle size with tree-shaking
+- [x] Create backend routes for sitemap.xml generation
+- [x] Create backend routes for robots.txt generation
+- [x] Add dynamic URL generation for all pages
+- [x] Update backend/server.js with new routes
 
-## Testing and Monitoring
+## 5. Optimize Images
 
-- [x] Run Lighthouse performance tests
-- [x] Monitor network requests in Chrome DevTools
-- [x] Test mobile performance with throttling
-- [x] Verify improvements in page load times
-- [x] Deploy production build to backend server
+- [ ] Implement WebP conversion for uploaded images
+- [ ] Add responsive image sizing
+- [ ] Update image components with lazy loading
+- [ ] Add proper alt tags and metadata
+
+## 6. Improve Semantic HTML Structure
+
+- [x] Add proper heading hierarchy (h1-h6)
+- [x] Implement main, article, section, aside tags
+- [x] Add navigation landmarks
+- [x] Update all page components with semantic structure
+
+## 7. Add Prerendering
+
+- [ ] Configure prerender-spa-plugin in build process
+- [ ] Set up routes for prerendering
+- [ ] Test prerendered HTML generation
+- [ ] Update build scripts
+
+## 8. Add Canonical Tags and Open Graph
+
+- [x] Implement canonical URLs for all pages
+- [x] Add Open Graph meta tags for social sharing
+- [x] Add Twitter Card meta tags
+- [x] Test social media sharing
+
+## 9. Core Web Vitals Optimizations
+
+- [ ] Optimize lazy loading implementation
+- [ ] Improve caching headers
+- [ ] Reduce render-blocking resources
+- [ ] Optimize font loading
+- [ ] Add service worker for caching
+
+## Testing and Validation
+
+- [ ] Test prerendering functionality
+- [ ] Verify sitemap and robots.txt accessibility
+- [ ] Validate structured data with Google's tool
+- [ ] Test Core Web Vitals improvements
+- [ ] Run SEO audit tools (Lighthouse, etc.)

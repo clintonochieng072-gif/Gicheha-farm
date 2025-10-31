@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { CartProvider } from "./context/CartContext";
 
 // Lazy load components for code-splitting
@@ -24,155 +25,157 @@ const LoadingSpinner = () => (
 
 function App() {
   return (
-    <CartProvider>
-      <Router>
-        <Routes>
-          {/* Admin routes - no header/footer */}
-          <Route path="/" element={<Admin />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/admin/forgot-password" element={<ForgotPassword />} />
-          <Route
-            path="/admin/reset-password/:token"
-            element={<ResetPassword />}
-          />
-          <Route path="/admin/*" element={<Admin />} />
+    <HelmetProvider>
+      <CartProvider>
+        <Router>
+          <Routes>
+            {/* Admin routes - no header/footer */}
+            <Route path="/" element={<Admin />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/forgot-password" element={<ForgotPassword />} />
+            <Route
+              path="/admin/reset-password/:token"
+              element={<ResetPassword />}
+            />
+            <Route path="/admin/*" element={<Admin />} />
 
-          {/* Public routes - with header/footer */}
-          <Route
-            path="/public"
-            element={
-              <Suspense fallback={<LoadingSpinner />}>
-                <div className="min-h-screen flex flex-col">
-                  <Suspense
-                    fallback={<div className="h-16 bg-white shadow-sm"></div>}
-                  >
-                    <Header />
-                  </Suspense>
-                  <main className="flex-grow">
-                    <Home />
-                  </main>
-                  <Suspense
-                    fallback={<div className="h-32 bg-secondary-800"></div>}
-                  >
-                    <Footer />
-                  </Suspense>
-                </div>
-              </Suspense>
-            }
-          />
-          <Route
-            path="/public/about"
-            element={
-              <Suspense fallback={<LoadingSpinner />}>
-                <div className="min-h-screen flex flex-col">
-                  <Suspense
-                    fallback={<div className="h-16 bg-white shadow-sm"></div>}
-                  >
-                    <Header />
-                  </Suspense>
-                  <main className="flex-grow">
-                    <About />
-                  </main>
-                  <Suspense
-                    fallback={<div className="h-32 bg-secondary-800"></div>}
-                  >
-                    <Footer />
-                  </Suspense>
-                </div>
-              </Suspense>
-            }
-          />
-          <Route
-            path="/public/products"
-            element={
-              <Suspense fallback={<LoadingSpinner />}>
-                <div className="min-h-screen flex flex-col">
-                  <Suspense
-                    fallback={<div className="h-16 bg-white shadow-sm"></div>}
-                  >
-                    <Header />
-                  </Suspense>
-                  <main className="flex-grow">
-                    <Products />
-                  </main>
-                  <Suspense
-                    fallback={<div className="h-32 bg-secondary-800"></div>}
-                  >
-                    <Footer />
-                  </Suspense>
-                </div>
-              </Suspense>
-            }
-          />
-          <Route
-            path="/public/testimonials"
-            element={
-              <Suspense fallback={<LoadingSpinner />}>
-                <div className="min-h-screen flex flex-col">
-                  <Suspense
-                    fallback={<div className="h-16 bg-white shadow-sm"></div>}
-                  >
-                    <Header />
-                  </Suspense>
-                  <main className="flex-grow">
-                    <Testimonials />
-                  </main>
-                  <Suspense
-                    fallback={<div className="h-32 bg-secondary-800"></div>}
-                  >
-                    <Footer />
-                  </Suspense>
-                </div>
-              </Suspense>
-            }
-          />
-          <Route
-            path="/public/gallery"
-            element={
-              <Suspense fallback={<LoadingSpinner />}>
-                <div className="min-h-screen flex flex-col">
-                  <Suspense
-                    fallback={<div className="h-16 bg-white shadow-sm"></div>}
-                  >
-                    <Header />
-                  </Suspense>
-                  <main className="flex-grow">
-                    <Gallery />
-                  </main>
-                  <Suspense
-                    fallback={<div className="h-32 bg-secondary-800"></div>}
-                  >
-                    <Footer />
-                  </Suspense>
-                </div>
-              </Suspense>
-            }
-          />
-          <Route
-            path="/public/cart"
-            element={
-              <Suspense fallback={<LoadingSpinner />}>
-                <div className="min-h-screen flex flex-col">
-                  <Suspense
-                    fallback={<div className="h-16 bg-white shadow-sm"></div>}
-                  >
-                    <Header />
-                  </Suspense>
-                  <main className="flex-grow">
-                    <Cart />
-                  </main>
-                  <Suspense
-                    fallback={<div className="h-32 bg-secondary-800"></div>}
-                  >
-                    <Footer />
-                  </Suspense>
-                </div>
-              </Suspense>
-            }
-          />
-        </Routes>
-      </Router>
-    </CartProvider>
+            {/* Public routes - with header/footer */}
+            <Route
+              path="/public"
+              element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <div className="min-h-screen flex flex-col">
+                    <Suspense
+                      fallback={<div className="h-16 bg-white shadow-sm"></div>}
+                    >
+                      <Header />
+                    </Suspense>
+                    <main className="flex-grow">
+                      <Home />
+                    </main>
+                    <Suspense
+                      fallback={<div className="h-32 bg-secondary-800"></div>}
+                    >
+                      <Footer />
+                    </Suspense>
+                  </div>
+                </Suspense>
+              }
+            />
+            <Route
+              path="/public/about"
+              element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <div className="min-h-screen flex flex-col">
+                    <Suspense
+                      fallback={<div className="h-16 bg-white shadow-sm"></div>}
+                    >
+                      <Header />
+                    </Suspense>
+                    <main className="flex-grow">
+                      <About />
+                    </main>
+                    <Suspense
+                      fallback={<div className="h-32 bg-secondary-800"></div>}
+                    >
+                      <Footer />
+                    </Suspense>
+                  </div>
+                </Suspense>
+              }
+            />
+            <Route
+              path="/public/products"
+              element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <div className="min-h-screen flex flex-col">
+                    <Suspense
+                      fallback={<div className="h-16 bg-white shadow-sm"></div>}
+                    >
+                      <Header />
+                    </Suspense>
+                    <main className="flex-grow">
+                      <Products />
+                    </main>
+                    <Suspense
+                      fallback={<div className="h-32 bg-secondary-800"></div>}
+                    >
+                      <Footer />
+                    </Suspense>
+                  </div>
+                </Suspense>
+              }
+            />
+            <Route
+              path="/public/testimonials"
+              element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <div className="min-h-screen flex flex-col">
+                    <Suspense
+                      fallback={<div className="h-16 bg-white shadow-sm"></div>}
+                    >
+                      <Header />
+                    </Suspense>
+                    <main className="flex-grow">
+                      <Testimonials />
+                    </main>
+                    <Suspense
+                      fallback={<div className="h-32 bg-secondary-800"></div>}
+                    >
+                      <Footer />
+                    </Suspense>
+                  </div>
+                </Suspense>
+              }
+            />
+            <Route
+              path="/public/gallery"
+              element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <div className="min-h-screen flex flex-col">
+                    <Suspense
+                      fallback={<div className="h-16 bg-white shadow-sm"></div>}
+                    >
+                      <Header />
+                    </Suspense>
+                    <main className="flex-grow">
+                      <Gallery />
+                    </main>
+                    <Suspense
+                      fallback={<div className="h-32 bg-secondary-800"></div>}
+                    >
+                      <Footer />
+                    </Suspense>
+                  </div>
+                </Suspense>
+              }
+            />
+            <Route
+              path="/public/cart"
+              element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <div className="min-h-screen flex flex-col">
+                    <Suspense
+                      fallback={<div className="h-16 bg-white shadow-sm"></div>}
+                    >
+                      <Header />
+                    </Suspense>
+                    <main className="flex-grow">
+                      <Cart />
+                    </main>
+                    <Suspense
+                      fallback={<div className="h-32 bg-secondary-800"></div>}
+                    >
+                      <Footer />
+                    </Suspense>
+                  </div>
+                </Suspense>
+              }
+            />
+          </Routes>
+        </Router>
+      </CartProvider>
+    </HelmetProvider>
   );
 }
 
