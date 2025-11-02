@@ -21,7 +21,18 @@ const path = require("path");
 const app = express();
 
 // Serve static files from the React app build directory
-app.use(express.static(path.join(__dirname, "../frontend/build")));
+app.use(
+  "/public",
+  express.static(path.join(__dirname, "../frontend/build"), {
+    setHeaders: (res, path) => {
+      if (path.endsWith(".css")) {
+        res.setHeader("Content-Type", "text/css");
+      } else if (path.endsWith(".js")) {
+        res.setHeader("Content-Type", "application/javascript");
+      }
+    },
+  })
+);
 
 // Compression middleware - compress all responses
 app.use(
@@ -200,7 +211,7 @@ Sitemap: ${baseUrl}/sitemap.xml`;
 });
 
 // Catch all handler: send back React's index.html file for client-side routing
-app.get("*", (req, res) => {
+app.get("/public/*", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
 });
 
