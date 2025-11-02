@@ -5,7 +5,7 @@ node_modules/
 dist/
 build/
 frontend/node_modules/
-frontend/build/
+# frontend/build/
 
 # Sensitive configuration files
 backend/.env
