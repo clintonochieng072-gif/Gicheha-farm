@@ -13,9 +13,6 @@ const connectDB = require("./config/database");
 // Load environment variables
 dotenv.config();
 
-// Connect to database
-connectDB();
-
 const products = [
   {
     name: "Fresh Eggs",
@@ -243,83 +240,84 @@ const teamMembers = [
 ];
 
 const adminUser = {
-  email: "Gicheharongai@gmail.com",
-  password: "admin123456",
+  email: process.env.ADMIN_EMAIL || "Gicheharongai@gmail.com",
+  password: process.env.ADMIN_PASSWORD || "admin123456",
   role: "admin",
 };
 
-const importData = async () => {
-  try {
-    // Check if data already exists
-    const existingProducts = await Product.countDocuments();
-    const existingAdmins = await Admin.countDocuments();
-    const existingUnits = await Unit.countDocuments();
-    const existingFeatures = await Feature.countDocuments();
-    const existingAbouts = await About.countDocuments();
-    const existingTeam = await Team.countDocuments();
+const seedDatabase = async () => {
+  console.log("Checking if database needs seeding...");
 
-    if (
-      existingProducts > 0 ||
-      existingAdmins > 0 ||
-      existingUnits > 0 ||
-      existingFeatures > 0 ||
-      existingAbouts > 0 ||
-      existingTeam > 0
-    ) {
-      console.log(
-        "Data already exists! Skipping seed to preserve existing data."
-      );
-      console.log(
-        `Found ${existingProducts} products, ${existingAdmins} admin users, ${existingUnits} units, ${existingFeatures} features, ${existingAbouts} about entries, and ${existingTeam} team members.`
-      );
-      process.exit();
-    }
-
-    // Only seed if database is empty
-    console.log("Database is empty. Seeding initial data...");
-
-    // Insert new data
-    await Product.insertMany(products);
-    await Testimonial.insertMany(testimonials);
-    await Gallery.insertMany(galleryImages);
-    await Unit.insertMany(units);
-    await Feature.insertMany(features);
-    await About.insertMany(abouts);
-    await Team.insertMany(teamMembers);
-
-    // Create admin user
-    const admin = new Admin(adminUser);
-    await admin.save();
-
-    console.log("Initial data seeded successfully!");
-    process.exit();
-  } catch (error) {
-    console.error("Error importing data:", error);
-    process.exit(1);
+  // Check if admin user already exists to prevent re-seeding
+  const adminExists = await Admin.countDocuments();
+  if (adminExists > 0) {
+    console.log("Admin user already exists. Skipping seed process.");
+    return;
   }
+
+  console.log("Database appears empty. Seeding initial data...");
+
+  // Using Promise.all for concurrent insertions
+  await Promise.all([
+    Product.insertMany(products),
+    Testimonial.insertMany(testimonials),
+    Gallery.insertMany(galleryImages),
+    Unit.insertMany(units),
+    Feature.insertMany(features),
+    About.insertMany(abouts),
+    Team.insertMany(teamMembers),
+  ]);
+  console.log(
+    "Seeded collections: Products, Testimonials, Gallery, Units, Features, About, Team."
+  );
+
+  // Create admin user
+  if (!adminUser.password || adminUser.password === "admin123456") {
+    console.warn(
+      "Warning: Using a default or weak admin password. Set ADMIN_PASSWORD in your .env file."
+    );
+  }
+  const admin = new Admin(adminUser);
+  await admin.save();
+
+  console.log("Admin user created successfully.");
+  console.log("Initial data seeded successfully!");
 };
 
 const destroyData = async () => {
-  try {
-    await Product.deleteMany();
-    await Testimonial.deleteMany();
-    await Gallery.deleteMany();
-    await Admin.deleteMany();
-    await Unit.deleteMany();
-    await Feature.deleteMany();
-    await About.deleteMany();
-    await Team.deleteMany();
+  console.log("Destroying all data...");
+  // Using Promise.all for concurrent deletions
+  await Promise.all([
+    Product.deleteMany(),
+    Testimonial.deleteMany(),
+    Gallery.deleteMany(),
+    Admin.deleteMany(),
+    Unit.deleteMany(),
+    Feature.deleteMany(),
+    About.deleteMany(),
+    Team.deleteMany(),
+  ]);
+  console.log("All data destroyed!");
+};
 
-    console.log("Data Destroyed!");
-    process.exit();
+const main = async () => {
+  try {
+    await connectDB();
+
+    if (process.argv[2] === "-d") {
+      await destroyData();
+    } else {
+      await seedDatabase();
+    }
   } catch (error) {
-    console.error("Error destroying data:", error);
+    console.error("An error occurred during the script execution:", error);
     process.exit(1);
+  } finally {
+    // Ensure the database connection is closed
+    await mongoose.connection.close();
+    console.log("Database connection closed.");
+    process.exit(0);
   }
 };
 
-if (process.argv[2] === "-d") {
-  destroyData();
-} else {
-  importData();
-}
+main();

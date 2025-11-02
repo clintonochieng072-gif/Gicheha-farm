@@ -4,6 +4,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const compression = require("compression");
+const helmet = require("helmet");
 const connectDB = require("./config/database");
 const productRoutes = require("./routes/productRoutes");
 const testimonialRoutes = require("./routes/testimonialRoutes");
@@ -19,20 +20,6 @@ const teamRoutes = require("./routes/teamRoutes");
 const path = require("path");
 
 const app = express();
-
-// Serve static files from the React app build directory
-app.use(
-  "/public",
-  express.static(path.join(__dirname, "../frontend/build"), {
-    setHeaders: (res, path) => {
-      if (path.endsWith(".css")) {
-        res.setHeader("Content-Type", "text/css");
-      } else if (path.endsWith(".js")) {
-        res.setHeader("Content-Type", "application/javascript");
-      }
-    },
-  })
-);
 
 // Compression middleware - compress all responses
 app.use(
@@ -86,6 +73,9 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 
+// Security Middleware
+app.use(helmet());
+
 // register routes
 app.use("/api/products", productRoutes);
 app.use("/api/testimonials", testimonialRoutes);
@@ -98,6 +88,12 @@ app.use("/api/units", unitRoutes);
 app.use("/api/features", featureRoutes);
 app.use("/api/about", aboutRoutes);
 app.use("/api/team", teamRoutes);
+
+// --- Serving Frontend ---
+// Serve static files from the React app build directory
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+// --- End Serving Frontend ---
 
 // Serve static files from uploads directory with caching headers
 app.use(
@@ -123,30 +119,6 @@ app.use(
   })
 );
 
-// Root route
-app.get("/", (req, res) => {
-  res.json({
-    message: "Gicheha Farm Backend API",
-    version: "1.0.0",
-    status: "Running",
-    endpoints: {
-      health: "/api/health",
-      products: "/api/products",
-      testimonials: "/api/testimonials",
-      gallery: "/api/gallery",
-      admin: "/api/admin",
-      categories: "/api/categories",
-      socialMedia: "/api/social-media",
-      logos: "/api/logos",
-      units: "/api/units",
-      features: "/api/features",
-      about: "/api/about",
-      team: "/api/team",
-    },
-    documentation: "API endpoints are available under /api/* paths",
-  });
-});
-
 // Health check route
 app.get("/api/health", (req, res) => {
   res.json({ status: "OK", message: "Gicheha Farm Backend is running" });
@@ -161,31 +133,31 @@ app.get("/sitemap.xml", (req, res) => {
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>${baseUrl}/public</loc>
+    <loc>${baseUrl}/</loc>
     <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>${baseUrl}/public/about</loc>
+    <loc>${baseUrl}/about</loc>
     <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>${baseUrl}/public/products</loc>
+    <loc>${baseUrl}/products</loc>
     <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>${baseUrl}/public/gallery</loc>
+    <loc>${baseUrl}/gallery</loc>
     <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>${baseUrl}/public/testimonials</loc>
+    <loc>${baseUrl}/testimonials</loc>
     <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -210,11 +182,6 @@ Sitemap: ${baseUrl}/sitemap.xml`;
   res.send(robotsTxt);
 });
 
-// Catch all handler: send back React's index.html file for client-side routing
-app.get("/public/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
-});
-
 // 404 for API routes
 app.use("/api/*", (req, res, next) => {
   res.status(404).json({ message: "API endpoint not found" });
@@ -232,6 +199,11 @@ app.use((err, req, res, next) => {
   };
   if (process.env.NODE_ENV === "development") payload.stack = err.stack;
   res.status(status).json(payload);
+});
+
+// Catch-all handler for client-side routing: send back React's index.html file.
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
 });
 
 const PORT = process.env.PORT || 5000;

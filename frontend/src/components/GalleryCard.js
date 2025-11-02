@@ -10,15 +10,19 @@ const GalleryCard = ({ image }) => {
       />
       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
         <div className="text-white text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <h3 className="text-lg font-semibold mb-2">{image.title}</h3>
+          {image.title && (
+            <h3 className="text-lg font-semibold mb-2">{image.title}</h3>
+          )}
           {image.description && <p className="text-sm">{image.description}</p>}
         </div>
       </div>
-      <div className="absolute top-2 left-2">
-        <span className="px-2 py-1 text-xs font-medium rounded bg-primary-600 text-white capitalize">
-          {image.category}
-        </span>
-      </div>
+      {image.category && (
+        <div className="absolute top-2 left-2">
+          <span className="px-2 py-1 text-xs font-medium rounded bg-primary-600 text-white capitalize">
+            {image.category}
+          </span>
+        </div>
+      )}
     </div>
   );
 };

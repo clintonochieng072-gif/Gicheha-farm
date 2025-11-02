@@ -31,18 +31,24 @@ const TestimonialCard = ({ testimonial }) => {
           </div>
         )}
         <div>
-          <h4 className="font-semibold text-secondary-800">
-            {testimonial.name}
-          </h4>
-          <div className="flex items-center space-x-1">
-            {renderStars(testimonial.rating)}
-          </div>
+          {testimonial.name && (
+            <h4 className="font-semibold text-secondary-800">
+              {testimonial.name}
+            </h4>
+          )}
+          {testimonial.rating && (
+            <div className="flex items-center space-x-1">
+              {renderStars(testimonial.rating)}
+            </div>
+          )}
         </div>
       </div>
 
-      <blockquote className="text-secondary-600 italic">
-        "{testimonial.message}"
-      </blockquote>
+      {testimonial.message && (
+        <blockquote className="text-secondary-600 italic">
+          "{testimonial.message}"
+        </blockquote>
+      )}
     </div>
   );
 };

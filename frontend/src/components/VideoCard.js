@@ -15,17 +15,23 @@ const VideoCard = ({ video }) => {
         </div>
       </div>
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-secondary-800 mb-2">
-          {video.title}
-        </h3>
+        {video.title && (
+          <h3 className="text-lg font-semibold text-secondary-800 mb-2">
+            {video.title}
+          </h3>
+        )}
         {video.description && (
           <p className="text-secondary-600 text-sm leading-relaxed">
             {video.description}
           </p>
         )}
         <div className="mt-3 flex items-center justify-between text-xs text-secondary-500">
-          <span className="capitalize">{video.category}</span>
-          <span>{new Date(video.createdAt).toLocaleDateString()}</span>
+          {video.category && (
+            <span className="capitalize">{video.category}</span>
+          )}
+          {video.createdAt && (
+            <span>{new Date(video.createdAt).toLocaleDateString()}</span>
+          )}
         </div>
       </div>
     </div>

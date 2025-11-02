@@ -59,42 +59,50 @@ const ProductCard = ({ product, onAddToCart }) => {
             </div>
           </>
         )}
-        <div className="absolute top-2 right-2">
-          <span
-            className={`px-2 py-1 text-xs font-medium rounded ${
-              product.inStock
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            }`}
-          >
-            {product.inStock ? "In Stock" : "Out of Stock"}
-          </span>
-        </div>
+        {product.inStock !== undefined && (
+          <div className="absolute top-2 right-2">
+            <span
+              className={`px-2 py-1 text-xs font-medium rounded ${
+                product.inStock
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+              }`}
+            >
+              {product.inStock ? "In Stock" : "Out of Stock"}
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="p-4">
         <h3 className="text-lg font-semibold text-secondary-800 mb-2">
           {product.name || "Unnamed Product"}
         </h3>
-        <p className="text-secondary-600 text-sm mb-3 line-clamp-2">
-          {product.description || "No description available"}
-        </p>
+        {product.description && (
+          <p className="text-secondary-600 text-sm mb-3 line-clamp-2">
+            {product.description}
+          </p>
+        )}
 
         <div className="flex items-center justify-between mb-3">
-          <span className="text-2xl font-bold text-primary-600">
-            KSh {product.price || "0"}
-          </span>
-          <span className="text-sm text-secondary-500">
-            per {product.unit || "unit"}
-          </span>
+          {product.price && (
+            <span className="text-2xl font-bold text-primary-600">
+              KSh {product.price}
+            </span>
+          )}
+          {product.unit && (
+            <span className="text-sm text-secondary-500">
+              {product.unit === "single piece" ? "each" : `per ${product.unit}`}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-secondary-600 capitalize">
-            {product.category && product.category !== ""
-              ? product.category
-              : "Uncategorized"}
-          </span>
+          {product.category && product.category !== "" && (
+            <span className="text-sm text-secondary-600 capitalize">
+              {product.category}
+            </span>
+          )}
           <button
             onClick={() => onAddToCart && onAddToCart(product)}
             className="btn-primary flex items-center space-x-2"
