@@ -89,16 +89,19 @@ app.use("/api/features", featureRoutes);
 app.use("/api/about", aboutRoutes);
 app.use("/api/team", teamRoutes);
 
+// Determine the root directory of the project
+const projectRoot = path.join(__dirname, "..");
+
 // --- Serving Frontend ---
 // Serve static files from the React app build directory
-app.use(express.static(path.join(__dirname, "../frontend/build")));
+app.use(express.static(path.join(projectRoot, "frontend/build")));
 
 // --- End Serving Frontend ---
 
 // Serve static files from uploads directory with caching headers
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "uploads"), {
+  express.static(path.join(projectRoot, "backend/uploads"), {
     maxAge: "30d", // Cache for 30 days
     etag: true,
     lastModified: true,
@@ -203,7 +206,7 @@ app.use((err, req, res, next) => {
 
 // Catch-all handler for client-side routing: send back React's index.html file.
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
+  res.sendFile(path.join(projectRoot, "frontend/build/index.html"));
 });
 
 const PORT = process.env.PORT || 5000;
